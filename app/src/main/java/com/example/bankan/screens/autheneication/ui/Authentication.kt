@@ -118,7 +118,6 @@ fun AuthenticationForm(
         ) {
             Spacer(modifier = Modifier.height(32.dp))
             AuthenticationTitle(
-                modifier = Modifier.fillMaxSize(),
                 authenticationMode = authenticationMode
             )
             Spacer(modifier = Modifier.height(40.dp))
