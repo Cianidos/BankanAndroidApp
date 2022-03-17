@@ -1,4 +1,4 @@
-package com.example.bankan.screens.autheneication
+package com.example.bankan.screens.autheneication.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bankan.R
-import com.example.bankan.screens.autheneication.viewmodel.*
 import com.example.bankan.common.ui.theme.BankanTheme
+import com.example.bankan.screens.autheneication.viewmodel.*
 
 
 @Preview(showBackground = true)
@@ -102,8 +102,8 @@ fun AuthenticationContent(
 fun AuthenticationForm(
     modifier: Modifier = Modifier,
     authenticationMode: AuthenticationMode,
-    email: String?,
-    password: String?,
+    email: String,
+    password: String,
     completedPasswordRequirements: List<PasswordRequirements>,
     enableAuthentication: Boolean,
     onEmailChanged: (email: String) -> Unit,
@@ -135,7 +135,7 @@ fun AuthenticationForm(
                 ) {
                     EmailInput(
                         modifier = Modifier.fillMaxWidth(),
-                        email = email ?: "",
+                        email = email,
                         onEmailChanged = onEmailChanged
                     ) {
                         passwordFocusRequester.requestFocus()
@@ -145,7 +145,7 @@ fun AuthenticationForm(
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(passwordFocusRequester),
-                        password = password ?: "",
+                        password = password,
                         onPasswordChanged = onPasswordChanged,
                         onDoneClicked = onAuthenticate
                     )
@@ -187,6 +187,7 @@ fun AuthenticationTitle(
 ) {
     BankanTheme {
         Text(
+            modifier = modifier,
             text = stringResource(
                 if (authenticationMode == AuthenticationMode.SIGN_IN) {
                     R.string.label_sign_in_to_account
@@ -279,7 +280,6 @@ fun Requirement(
     satisfied: Boolean
 ) {
     BankanTheme {
-
         val tint = if (satisfied) {
             MaterialTheme.colors.primary
         } else MaterialTheme.colors.onSurface.copy(alpha = 0.4f)
@@ -296,7 +296,7 @@ fun Requirement(
         }
 
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .padding(6.dp)
                 .semantics(mergeDescendants = true) {
                     text = AnnotatedString(requirementStatus)
