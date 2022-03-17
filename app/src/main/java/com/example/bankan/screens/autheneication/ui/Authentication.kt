@@ -26,21 +26,21 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bankan.R
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.autheneication.viewmodel.*
+import org.koin.androidx.compose.viewModel
 
 
 @Preview(showBackground = true)
 @Composable
 fun Authentication() {
-    val viewModel: AuthenticationViewModel = viewModel()
+    val viewModel: AuthenticationViewModel by viewModel()
+    val uiState by viewModel.uiState.collectAsState()
     BankanTheme {
         AuthenticationContent(
             modifier = Modifier.fillMaxWidth(),
-            authenticationState =
-            viewModel.uiState.collectAsState().value,
+            authenticationState = uiState,
             handleEvent = viewModel::handleEvent
         )
     }

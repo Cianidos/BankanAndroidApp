@@ -1,10 +1,10 @@
 package com.example.bankan.common
 
 import android.app.Application
+import com.example.bankan.screens.autheneication.authenticationModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
-import org.koin.dsl.module
 
 class BankanApplication : Application() {
     override fun onCreate() {
@@ -13,8 +13,7 @@ class BankanApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@BankanApplication)
-            module {
-            }
+            modules(authenticationModule)
         }
     }
 }

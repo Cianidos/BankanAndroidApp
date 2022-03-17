@@ -5,14 +5,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AuthenticationViewModel : ViewModel() {
-    val uiState = MutableStateFlow(AuthenticationState())
+
+    private val _uiState = MutableStateFlow(AuthenticationState())
+    val uiState = _uiState.asStateFlow()
 
     private fun toggleAuthenticationMode() {
-        val authenticationMode = uiState.value.authenticationMode
+        val authenticationMode = _uiState.value.authenticationMode
         val newAuthenticationMode = if (
             authenticationMode == AuthenticationMode.SIGN_IN
         ) {
@@ -20,14 +23,14 @@ class AuthenticationViewModel : ViewModel() {
         } else {
             AuthenticationMode.SIGN_IN
         }
-        uiState.value = uiState.value.copy(
+        _uiState.value = _uiState.value.copy(
             authenticationMode = newAuthenticationMode
         )
     }
 
 
     private fun updateEmail(email: String) {
-        uiState.value = uiState.value.copy(
+        _uiState.value = _uiState.value.copy(
             email = email
         )
     }
@@ -45,7 +48,7 @@ class AuthenticationViewModel : ViewModel() {
         if (password.any { it.isDigit() }) {
             requirements.add(PasswordRequirements.NUMBER)
         }
-        uiState.value = uiState.value.copy(
+        _uiState.value = _uiState.value.copy(
             password = password,
             passwordRequirements = requirements.toList()
         )
@@ -53,14 +56,14 @@ class AuthenticationViewModel : ViewModel() {
 
 
     private fun authenticate() {
-        uiState.value = uiState.value.copy(
+        _uiState.value = _uiState.value.copy(
             isLoading = true
         )
         viewModelScope.launch(Dispatchers.IO) {
             delay(2000L)
 
             withContext(Dispatchers.Main) {
-                uiState.value = uiState.value.copy(
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = "Something went wrong !"
                 )
@@ -70,7 +73,7 @@ class AuthenticationViewModel : ViewModel() {
 
 
     private fun dismissError() {
-        uiState.value = uiState.value.copy(
+        _uiState.value = _uiState.value.copy(
             error = null
         )
     }
