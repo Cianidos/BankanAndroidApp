@@ -29,13 +29,12 @@ import androidx.compose.ui.unit.sp
 import com.example.bankan.R
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.autheneication.viewmodel.*
-import org.koin.androidx.compose.viewModel
 
 
 @Preview(showBackground = true)
 @Composable
 fun Authentication() {
-    val viewModel: AuthenticationViewModel by viewModel()
+    val viewModel: AuthenticationViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val uiState by viewModel.uiState.collectAsState()
     BankanTheme {
         AuthenticationContent(
@@ -78,8 +77,11 @@ fun AuthenticationContent(
                         handleEvent(AuthenticationEvent.Authenticate)
                     },
                     onToggleMode = {
-                        handleEvent(AuthenticationEvent.ToggleAuthenticationMode)
-                    }
+                        handleEvent(AuthenticationEvent.ChangeAuthenticationMode(if (authenticationState.authenticationMode == AuthenticationMode.SIGN_IN) AuthenticationMode.SIGN_UP else AuthenticationMode.SIGN_IN))
+                    },
+                    onContinueAsGuest = {
+                        handleEvent(AuthenticationEvent.ChangeAuthenticationMode(AuthenticationMode.GUEST))
+                    },
                 )
 
                 authenticationState.error?.let { error ->
@@ -109,7 +111,8 @@ fun AuthenticationForm(
     onEmailChanged: (email: String) -> Unit,
     onPasswordChanged: (password: String) -> Unit,
     onAuthenticate: () -> Unit,
-    onToggleMode: () -> Unit
+    onToggleMode: () -> Unit,
+    onContinueAsGuest: () -> Unit
 ) {
     BankanTheme {
         Column(
@@ -132,26 +135,38 @@ fun AuthenticationForm(
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    EmailInput(
-                        modifier = Modifier.fillMaxWidth(),
-                        email = email,
-                        onEmailChanged = onEmailChanged
-                    ) {
-                        passwordFocusRequester.requestFocus()
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    PasswordInput(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(passwordFocusRequester),
-                        password = password,
-                        onPasswordChanged = onPasswordChanged,
-                        onDoneClicked = onAuthenticate
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    AnimatedVisibility(visible = authenticationMode != AuthenticationMode.GUEST) {
+                        Column(
+                            modifier = Modifier,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            EmailInput(
+                                modifier = Modifier.fillMaxWidth(),
+                                email = email,
+                                onEmailChanged = onEmailChanged
+                            ) {
+                                passwordFocusRequester.requestFocus()
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
 
+                            PasswordInput(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(passwordFocusRequester),
+                                password = password,
+                                onPasswordChanged = onPasswordChanged,
+                                onDoneClicked = onAuthenticate
+                            )
+                        }
+                    }
                     AnimatedVisibility(visible = authenticationMode == AuthenticationMode.SIGN_UP) {
-                        PasswordRequirementsUI(satisfiedRequirements = completedPasswordRequirements)
+                        Column(
+                            modifier = Modifier,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            PasswordRequirementsUI(satisfiedRequirements = completedPasswordRequirements)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -172,6 +187,9 @@ fun AuthenticationForm(
                 authenticationMode = authenticationMode,
                 toggleAuthentication = {
                     onToggleMode()
+                },
+                continueAsGuest = {
+                    onContinueAsGuest()
                 }
             )
         }
@@ -253,7 +271,6 @@ fun PasswordRequirementsUI(
     modifier: Modifier = Modifier,
     satisfiedRequirements: List<PasswordRequirements>
 ) {
-
     BankanTheme {
         Column(
             modifier = modifier
@@ -432,7 +449,6 @@ fun AuthenticationButton(
     onAuthenticate: () -> Unit
 ) {
     BankanTheme {
-
         Button(
             modifier = modifier,
             onClick = {
@@ -442,12 +458,16 @@ fun AuthenticationButton(
         ) {
             Text(
                 text = stringResource(
-                    if (authenticationMode ==
-                        AuthenticationMode.SIGN_IN
-                    ) {
-                        R.string.action_sign_in
-                    } else {
-                        R.string.action_sign_up
+                    when (authenticationMode) {
+                        AuthenticationMode.SIGN_IN -> {
+                            R.string.action_sign_in
+                        }
+                        AuthenticationMode.SIGN_UP -> {
+                            R.string.action_sign_up
+                        }
+                        AuthenticationMode.GUEST -> {
+                            R.string.continue_as_guest
+                        }
                     }
                 )
             )
@@ -459,6 +479,7 @@ fun AuthenticationButton(
 fun ToggleAuthenticationMode(
     modifier: Modifier = Modifier,
     authenticationMode: AuthenticationMode,
+    continueAsGuest: () -> Unit,
     toggleAuthentication: () -> Unit
 ) {
     BankanTheme {
@@ -467,25 +488,45 @@ fun ToggleAuthenticationMode(
                 .padding(top = 16.dp),
             elevation = 8.dp
         ) {
-            TextButton(
+            Column(
                 modifier = Modifier
                     .background(MaterialTheme.colors.surface)
                     .padding(8.dp),
-                onClick = {
-                    toggleAuthentication()
-                }
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(
-                        if (authenticationMode ==
-                            AuthenticationMode.SIGN_IN
+                when (authenticationMode) {
+                    AuthenticationMode.GUEST -> {}
+                    else -> {
+                        TextButton(
+                            modifier = Modifier,
+                            onClick = { continueAsGuest() }
                         ) {
-                            R.string.action_need_account
-                        } else {
-                            R.string.action_already_have_account
+                            Text(
+                                text = stringResource(R.string.continue_as_guest),
+                                style = MaterialTheme.typography.caption,
+                                color = MaterialTheme.colors.secondary
+                            )
                         }
+                    }
+                }
+                TextButton(
+                    onClick = {
+                        toggleAuthentication()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(
+                            when (authenticationMode) {
+                                AuthenticationMode.SIGN_IN ->
+                                    R.string.action_need_account
+                                AuthenticationMode.SIGN_UP ->
+                                    R.string.action_already_have_account
+                                AuthenticationMode.GUEST ->
+                                    R.string.action_already_have_account
+                            }
+                        )
                     )
-                )
+                }
             }
         }
     }

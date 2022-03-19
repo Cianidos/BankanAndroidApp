@@ -14,15 +14,7 @@ class AuthenticationViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(AuthenticationState())
     val uiState = _uiState.asStateFlow()
 
-    private fun toggleAuthenticationMode() {
-        val authenticationMode = _uiState.value.authenticationMode
-        val newAuthenticationMode = if (
-            authenticationMode == AuthenticationMode.SIGN_IN
-        ) {
-            AuthenticationMode.SIGN_UP
-        } else {
-            AuthenticationMode.SIGN_IN
-        }
+    private fun changeAuthenticationMode(newAuthenticationMode: AuthenticationMode) {
         _uiState.value = _uiState.value.copy(
             authenticationMode = newAuthenticationMode
         )
@@ -56,6 +48,11 @@ class AuthenticationViewModel : ViewModel() {
 
 
     private fun authenticate() {
+//        when (_uiState.value.authenticationMode) {
+//            AuthenticationMode.SIGN_UP -> TODO()
+//            AuthenticationMode.SIGN_IN -> TODO()
+//            AuthenticationMode.GUEST -> TODO()
+//        }
         _uiState.value = _uiState.value.copy(
             isLoading = true
         )
@@ -81,8 +78,8 @@ class AuthenticationViewModel : ViewModel() {
 
     fun handleEvent(authenticationEvent: AuthenticationEvent) {
         when (authenticationEvent) {
-            is AuthenticationEvent.ToggleAuthenticationMode -> {
-                toggleAuthenticationMode()
+            is AuthenticationEvent.ChangeAuthenticationMode -> {
+                changeAuthenticationMode(authenticationEvent.newAuthenticationMode)
             }
             is AuthenticationEvent.EmailChanged -> {
                 updateEmail(authenticationEvent.emailAddress)
