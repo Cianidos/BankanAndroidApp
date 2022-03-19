@@ -63,10 +63,14 @@ fun AuthenticationContent(
                 AuthenticationForm(
                     modifier = Modifier.fillMaxSize(),
                     authenticationMode = authenticationState.authenticationMode,
+                    nickname = authenticationState.nickname,
                     email = authenticationState.email,
                     password = authenticationState.password,
                     completedPasswordRequirements = authenticationState.passwordRequirements,
                     enableAuthentication = authenticationState.isFormValid(),
+                    onNicknameChanged = { nickname ->
+                        handleEvent(AuthenticationEvent.NicknameChanged(nickname))
+                    },
                     onEmailChanged = { email ->
                         handleEvent(AuthenticationEvent.EmailChanged(email))
                     },
@@ -104,10 +108,12 @@ fun AuthenticationContent(
 fun AuthenticationForm(
     modifier: Modifier = Modifier,
     authenticationMode: AuthenticationMode,
+    nickname: String,
     email: String,
     password: String,
     completedPasswordRequirements: List<PasswordRequirements>,
     enableAuthentication: Boolean,
+    onNicknameChanged: (nickname: String) -> Unit,
     onEmailChanged: (email: String) -> Unit,
     onPasswordChanged: (password: String) -> Unit,
     onAuthenticate: () -> Unit,
@@ -124,6 +130,7 @@ fun AuthenticationForm(
                 authenticationMode = authenticationMode
             )
             Spacer(modifier = Modifier.height(40.dp))
+            val emailFocusRequester = FocusRequester()
             val passwordFocusRequester = FocusRequester()
             Card(
                 modifier = Modifier
@@ -135,18 +142,35 @@ fun AuthenticationForm(
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    AnimatedVisibility(visible = authenticationMode != AuthenticationMode.SIGN_IN) {
+                        Column(
+                            modifier = Modifier,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            NicknameInput(
+                                modifier = Modifier.fillMaxWidth(),
+                                nickname = nickname,
+                                onNicknameChanged = onNicknameChanged,
+                                onNextClicked = { emailFocusRequester.requestFocus() }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+
                     AnimatedVisibility(visible = authenticationMode != AuthenticationMode.GUEST) {
                         Column(
                             modifier = Modifier,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             EmailInput(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(emailFocusRequester),
                                 email = email,
-                                onEmailChanged = onEmailChanged
-                            ) {
-                                passwordFocusRequester.requestFocus()
-                            }
+                                onEmailChanged = onEmailChanged,
+                                onNextClicked = { passwordFocusRequester.requestFocus() }
+                            )
+
                             Spacer(modifier = Modifier.height(16.dp))
 
                             PasswordInput(
@@ -400,6 +424,45 @@ fun PasswordInput(
 }
 
 @Composable
+fun NicknameInput(
+    modifier: Modifier = Modifier,
+    nickname: String,
+    onNicknameChanged: (email: String) -> Unit,
+    onNextClicked: () -> Unit
+) {
+    BankanTheme {
+        TextField(
+            modifier = modifier,
+            value = nickname,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Text
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    onNextClicked()
+                }
+            ),
+            onValueChange = { newNickname ->
+                onNicknameChanged(newNickname)
+            },
+            label = {
+                Text(
+                    text = stringResource(R.string.label_nickname)
+                )
+            },
+            singleLine = true,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null
+                )
+            }
+        )
+    }
+}
+
+@Composable
 fun EmailInput(
     modifier: Modifier = Modifier,
     email: String,
@@ -485,34 +548,28 @@ fun ToggleAuthenticationMode(
     BankanTheme {
         Surface(
             modifier = modifier
-                .padding(top = 16.dp),
+                .background(MaterialTheme.colors.surface),
             elevation = 8.dp
         ) {
             Column(
-                modifier = Modifier
-                    .background(MaterialTheme.colors.surface)
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                when (authenticationMode) {
-                    AuthenticationMode.GUEST -> {}
-                    else -> {
-                        TextButton(
-                            modifier = Modifier,
-                            onClick = { continueAsGuest() }
-                        ) {
-                            Text(
-                                text = stringResource(R.string.continue_as_guest),
-                                style = MaterialTheme.typography.caption,
-                                color = MaterialTheme.colors.secondary
-                            )
-                        }
+                AnimatedVisibility(visible = authenticationMode != AuthenticationMode.GUEST) {
+                    TextButton(
+                        modifier = Modifier,
+                        onClick = { continueAsGuest() }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.continue_as_guest),
+                            style = MaterialTheme.typography.caption,
+                            color = MaterialTheme.colors.secondary
+                        )
                     }
                 }
                 TextButton(
-                    onClick = {
-                        toggleAuthentication()
-                    }
+                    modifier = Modifier,
+                    onClick = { toggleAuthentication() }
                 ) {
                     Text(
                         text = stringResource(
@@ -524,7 +581,8 @@ fun ToggleAuthenticationMode(
                                 AuthenticationMode.GUEST ->
                                     R.string.action_already_have_account
                             }
-                        )
+                        ),
+                    style = MaterialTheme.typography.button
                     )
                 }
             }
