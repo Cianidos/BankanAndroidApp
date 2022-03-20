@@ -20,13 +20,14 @@ import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.CardExample
 import com.example.bankan.common.ui.components.ListPreview
 import com.example.bankan.common.ui.theme.BankanTheme
-import com.example.bankan.screens.autheneication.ui.Authentication
+import com.example.bankan.screens.main.ui.BoardListPreview
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Authentication()
+            //Authentication()
+            BoardListPreview()
         }
     }
 
