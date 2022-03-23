@@ -8,8 +8,25 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class AnimationViewModel : ViewModel() {
     private var job: Job? = null
+
     private val _times = MutableStateFlow(0)
     val times = _times.asStateFlow()
+
+    private val _list = MutableStateFlow(
+        listOf(
+            "first board",
+            "newxt",
+            "1",
+            "",
+            "board next door"
+        )
+    )
+
+    val list = _list.asStateFlow()
+
+    fun deleteAtIndex(idx: Int) {
+        _list.value = list.value.toMutableList().apply { removeAt(idx) }
+    }
 
     init {
         job = viewModelScope.launch(Dispatchers.IO) {
