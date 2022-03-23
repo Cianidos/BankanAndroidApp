@@ -8,12 +8,13 @@ data class AuthenticationState(
     val passwordRequirements: List<PasswordRequirements> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
+    val authenticated: Boolean = false,
 ) {
-    fun isFormValid(): Boolean {
-        return password.isNotEmpty() && email.isNotEmpty() &&
+    fun isFormValid(): Boolean =
+        (password.isNotEmpty() && email.isNotEmpty() &&
                 (authenticationMode == AuthenticationMode.SIGN_IN ||
                         passwordRequirements.containsAll(
                             PasswordRequirements.values().toList()
-                        ))
-    }
+                        )))
+                || (authenticationMode == AuthenticationMode.GUEST && nickname.isNotEmpty())
 }

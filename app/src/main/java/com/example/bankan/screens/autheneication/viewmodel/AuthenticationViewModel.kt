@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 
 class AuthenticationViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AuthenticationState(nickname = ""))
+    private val _uiState = MutableStateFlow(AuthenticationState())
     val uiState = _uiState.asStateFlow()
 
     private fun changeAuthenticationMode(newAuthenticationMode: AuthenticationMode) {
@@ -53,26 +53,28 @@ class AuthenticationViewModel : ViewModel() {
 
 
     private fun authenticate() {
-//        when (_uiState.value.authenticationMode) {
+        when (_uiState.value.authenticationMode) {
+            AuthenticationMode.GUEST -> _uiState.value = _uiState.value.copy(authenticated = true)
 //            AuthenticationMode.SIGN_UP -> TODO()
 //            AuthenticationMode.SIGN_IN -> TODO()
-//            AuthenticationMode.GUEST -> TODO()
-//        }
-        _uiState.value = _uiState.value.copy(
-            isLoading = true
-        )
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(2000L)
-
-            withContext(Dispatchers.Main) {
+            else -> {
                 _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = "Something went wrong !"
+                    isLoading = true
                 )
+                viewModelScope.launch(Dispatchers.IO) {
+                    delay(2000L)
+
+                    withContext(Dispatchers.Main) {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = "Something went wrong !"
+                        )
+                    }
+                }
             }
+
         }
     }
-
 
     private fun dismissError() {
         _uiState.value = _uiState.value.copy(

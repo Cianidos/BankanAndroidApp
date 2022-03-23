@@ -33,14 +33,15 @@ import com.example.bankan.screens.autheneication.viewmodel.*
 
 @Preview(showBackground = true)
 @Composable
-fun Authentication() {
+fun Authentication(onAppEnter: () -> Unit = {}) {
     val viewModel: AuthenticationViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val uiState by viewModel.uiState.collectAsState()
     BankanTheme {
         AuthenticationContent(
             modifier = Modifier.fillMaxWidth(),
             authenticationState = uiState,
-            handleEvent = viewModel::handleEvent
+            handleEvent = viewModel::handleEvent,
+            appEnter = onAppEnter
         )
     }
 }
@@ -49,7 +50,8 @@ fun Authentication() {
 fun AuthenticationContent(
     modifier: Modifier = Modifier,
     authenticationState: AuthenticationState,
-    handleEvent: (event: AuthenticationEvent) -> Unit
+    handleEvent: (event: AuthenticationEvent) -> Unit,
+    appEnter: () -> Unit
 ) {
     BankanTheme {
         Box(
@@ -59,7 +61,6 @@ fun AuthenticationContent(
             if (authenticationState.isLoading) {
                 CircularProgressIndicator()
             } else {
-
                 AuthenticationForm(
                     modifier = Modifier.fillMaxSize(),
                     authenticationMode = authenticationState.authenticationMode,
@@ -79,6 +80,8 @@ fun AuthenticationContent(
                     },
                     onAuthenticate = {
                         handleEvent(AuthenticationEvent.Authenticate)
+                        if (authenticationState.authenticated)
+                            appEnter()
                     },
                     onToggleMode = {
                         handleEvent(AuthenticationEvent.ChangeAuthenticationMode(if (authenticationState.authenticationMode == AuthenticationMode.SIGN_IN) AuthenticationMode.SIGN_UP else AuthenticationMode.SIGN_IN))
@@ -582,7 +585,7 @@ fun ToggleAuthenticationMode(
                                     R.string.action_already_have_account
                             }
                         ),
-                    style = MaterialTheme.typography.button
+                        style = MaterialTheme.typography.button
                     )
                 }
             }

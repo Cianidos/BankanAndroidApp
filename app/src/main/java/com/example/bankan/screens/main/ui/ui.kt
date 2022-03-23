@@ -83,7 +83,9 @@ fun SwipeableBoardList(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeableBoardCard(modifier: Modifier = Modifier, text: String, onDelete: () -> Unit) {
+
     var contentSize: Size by remember { mutableStateOf(Size(48f, 48f)) }
+
     val swipeableState = rememberSwipeableState(0) {
         if (it == 1) {
             onDelete()
