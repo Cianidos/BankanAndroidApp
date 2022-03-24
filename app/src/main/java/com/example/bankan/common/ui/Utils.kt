@@ -3,6 +3,9 @@ package com.example.bankan.common.ui
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -20,12 +23,12 @@ inline fun Int.asDp(): Dp {
 }
 
 @Composable
-fun <T> EachAndBetween(
+fun <T> eachAndBetween(
     data: Iterable<T>,
     spacerHeight: Dp = 10.dp,
     content: @Composable (T) -> Unit
 ) {
-    EachAndBetween(data = data, between = {
+    eachAndBetween(data = data, between = {
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -35,7 +38,7 @@ fun <T> EachAndBetween(
 }
 
 @Composable
-fun <T> EachAndBetween(
+fun <T> eachAndBetween(
     data: Iterable<T>,
     between: @Composable () -> Unit,
     content: @Composable (T) -> Unit
@@ -44,6 +47,34 @@ fun <T> EachAndBetween(
     while (iterator.hasNext()) {
         content(iterator.next())
         if (iterator.hasNext())
+            between()
+    }
+}
+
+
+fun <T> LazyListScope.eachAndBetween(
+    data: List<T>,
+    spacerHeight: Dp = 10.dp,
+    spacerWidth: Dp = spacerHeight,
+    content: @Composable (T) -> Unit
+) {
+    eachAndBetween(data = data, between = {
+        Spacer(
+            modifier = Modifier
+                .height(spacerHeight)
+                .width(spacerWidth)
+        )
+    }, content = content)
+}
+
+fun <T> LazyListScope.eachAndBetween(
+    data: List<T>,
+    between: @Composable () -> Unit,
+    content: @Composable (T) -> Unit
+) {
+    itemsIndexed(data) { idx, value ->
+        content(value)
+        if (idx != data.lastIndex)
             between()
     }
 }

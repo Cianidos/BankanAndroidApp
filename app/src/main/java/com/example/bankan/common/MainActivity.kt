@@ -17,8 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.bankan.common.BankanScreen.*
-import com.example.bankan.common.ui.components.CardExample
-import com.example.bankan.common.ui.components.ListPreview
+import com.example.bankan.screens.board.ui.CardExample
+import com.example.bankan.screens.board.ui.ListPreview
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.autheneication.ui.Authentication
 import com.example.bankan.screens.main.ui.BoardListPreview

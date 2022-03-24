@@ -18,7 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bankan.common.DragExample
 import com.example.bankan.common.SwipeableSample
 import com.example.bankan.common.TransformableSample
-import com.example.bankan.common.ui.EachAndBetween
+import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.components.DashOutline
 import com.example.bankan.common.ui.theme.BankanTheme
 import kotlin.math.roundToInt
@@ -61,7 +61,7 @@ fun SwipeableBoardList(
     onDelete: (index: Int) -> Unit
 ) {
     Column(modifier = modifier) {
-        EachAndBetween(data = list.withIndex()) {
+        eachAndBetween(data = list.withIndex()) {
             SwipeableBoardCard(text = it.value, onDelete = { onDelete(it.index) })
         }
         Spacer(
@@ -111,7 +111,7 @@ fun SwipeableBoardCard(modifier: Modifier = Modifier, text: String, onDelete: ()
 @Composable
 fun BoardList(modifier: Modifier = Modifier, list: List<String>) {
     Column(modifier = modifier) {
-        EachAndBetween(data = list) {
+        eachAndBetween(data = list) {
             BoardCard(boardName = it)
         }
         Spacer(

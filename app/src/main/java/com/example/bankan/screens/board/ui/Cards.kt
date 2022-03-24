@@ -1,4 +1,4 @@
-package com.example.bankan.common.ui.components
+package com.example.bankan.screens.board.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,12 +21,11 @@ import com.example.bankan.common.ui.theme.BankanTheme
 @Composable
 fun CardExample() {
     Column {
-        CardPreview1(
-            name = "Some Simple name",
+        NameLessCard(
             description = "Some longer text. It  must be longer? and cause of this i need to write it. I dont know why but it doesn't work without meaningfull text"
         )
         Spacer(modifier = Modifier.height(10.dp))
-        CardPreview2(
+        Card(
             name = "Some Simple name",
             description = "Some longer text. It  must be longer? and cause of this i need to write it. I dont know why but it doesn't work without meaningfull text"
         )
@@ -34,12 +33,12 @@ fun CardExample() {
 }
 
 @Composable
-fun CardPreview1(name: String, description: String) {
+fun NameLessCard(description: String) {
     BankanTheme {
         val tagText = "#jjjj"
         Column(
             modifier = Modifier
-                .background(color = Color.Gray, shape = RoundedCornerShape(20.dp))
+                .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
                 .width(300.dp)
                 .aspectRatio(3.0f)
         ) {
@@ -83,12 +82,12 @@ fun CardPreview1(name: String, description: String) {
 }
 
 @Composable
-fun CardPreview2(name: String, description: String) {
+fun Card(name: String, description: String) {
     BankanTheme {
         val tagText = "#jjjj"
         Column(
             modifier = Modifier
-                .background(color = Color.Gray, shape = RoundedCornerShape(20.dp))
+                .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
                 .width(250.dp)
                 .aspectRatio(1.6f)
         ) {
