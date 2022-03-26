@@ -1,7 +1,7 @@
 package com.example.bankan.common
 
 enum class BankanScreen {
-    Authentication, Boards, Settings;
+    Authentication, BoardsList, Board, Settings;
 
     companion object {
         private val association = values().associateBy { it.name }
