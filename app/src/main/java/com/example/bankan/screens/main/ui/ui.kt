@@ -18,8 +18,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bankan.common.DragExample
 import com.example.bankan.common.SwipeableSample
 import com.example.bankan.common.TransformableSample
-import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.components.DashOutline
+import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import kotlin.math.roundToInt
 
@@ -34,11 +34,11 @@ fun MainMenu() {
 
 @Preview
 @Composable
-fun BoardListPreview() {
+fun BoardListPreview(modifier: Modifier = Modifier) {
     val viewModel = viewModel<AnimationViewModel>()
     val list by viewModel.list.collectAsState()
 
-    Column {
+    Column(modifier = modifier) {
         SwipeableBoardList(
             modifier = Modifier
                 .weight(1f)

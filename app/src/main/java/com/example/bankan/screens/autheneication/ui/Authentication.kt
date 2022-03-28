@@ -34,13 +34,13 @@ import org.koin.androidx.compose.viewModel
 
 @Preview(showBackground = true)
 @Composable
-fun Authentication(onAppEnter: () -> Unit = {}) {
+fun Authentication(modifier: Modifier = Modifier, onAppEnter: () -> Unit = {}) {
     val viewModel: AuthenticationViewModel by viewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     BankanTheme {
         AuthenticationContent(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             authenticationState = uiState,
             handleEvent = viewModel::handleEvent,
             appEnter = onAppEnter

@@ -8,6 +8,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DeveloperBoard
@@ -26,6 +27,7 @@ import com.example.bankan.screens.board.ui.ListPreview
 import com.example.bankan.screens.main.ui.BoardListPreview
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 
@@ -53,7 +55,7 @@ fun ContentWithBottomNavBarImpl(
     onBoardsListClicked: () -> Unit,
     onBoardClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
-    centerContent: @Composable () -> Unit
+    centerContent: @Composable (modifier: Modifier) -> Unit
 ) {
     Scaffold(modifier = modifier,
         bottomBar = {
@@ -68,22 +70,7 @@ fun ContentWithBottomNavBarImpl(
                     Icon(Icons.Outlined.Settings, contentDescription = "Settings")
                 }
             }
-        }) { centerContent() }
-}
-
-
-@Composable
-fun ContentWithBottomNavBar(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    content: @Composable () -> Unit
-) {
-    ContentWithBottomNavBarImpl(
-        onBoardsListClicked = { navController.navigate(route = BoardsList.name) },
-        onBoardClicked = { navController.navigate(route = Board.name) },
-        onSettingsClicked = { navController.navigate(route = Settings.name) },
-        centerContent = content
-    )
+        }) { centerContent(modifier = Modifier.padding(it)) }
 }
 
 
@@ -95,20 +82,46 @@ fun BankanApp() {
         val backstackEntry = navController.currentBackStackEntry
         val currentScreen = BankanScreen.fromRoute(backstackEntry?.destination?.route)
 
-        AnimatedNavHost(
-            navController = navController,
-            startDestination = currentScreen.name,
-        ) {
-            composable(Authentication.name) {
-                Authentication(onAppEnter = {
-                    navController.navigate(route = BoardsList.name)
-                })
-            }
+        NavHostContainer(navController = navController, currentScreen = currentScreen)
+        val d = 1 + 1
+    }
+}
 
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun NavHostContainer(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    currentScreen: BankanScreen,
+) {
+    @Composable
+    fun ContentWithBottomNavBar(
+        modifier: Modifier = Modifier,
+        content: @Composable (Modifier) -> Unit
+    ) {
+        ContentWithBottomNavBarImpl(
+            onBoardsListClicked = { navController.navigate(route = BoardsList.name) },
+            onBoardClicked = { navController.navigate(route = Board.name) },
+            onSettingsClicked = { navController.navigate(route = Settings.name) },
+            centerContent = content
+        )
+    }
+
+    AnimatedNavHost(
+        navController = navController,
+        startDestination = currentScreen.name,
+    ) {
+        composable(Authentication.name) {
+            Authentication(modifier) {
+                navController.navigate(route = "Main")
+            }
+        }
+
+        navigation(BoardsList.name, "Main") {
             composable(BoardsList.name,
                 enterTransition = {
                     slideIntoContainer(
-                        towards = AnimatedContentScope.SlideDirection.Left,
+                        towards = AnimatedContentScope.SlideDirection.Right,
                         animationSpec = tween(700)
                     )
                 },
@@ -118,19 +131,42 @@ fun BankanApp() {
                         animationSpec = tween(700)
                     )
                 }
-            ) {
-                ContentWithBottomNavBar(navController = navController) {
-                    BoardListPreview()
-                }
-            }
+            ) { ContentWithBottomNavBar { BoardListPreview(it) } }
 
             composable(
                 Board.name,
-            ) {
-                ContentWithBottomNavBar(navController = navController) {
-                    BoardScreenContentPreview()
+                enterTransition = {
+                    when (initialState.destination.route) {
+                        BoardsList.name ->
+                            slideIntoContainer(
+                                towards = AnimatedContentScope.SlideDirection.Left,
+                                animationSpec = tween(700)
+                            )
+                        Settings.name ->
+                            slideIntoContainer(
+                                towards = AnimatedContentScope.SlideDirection.Right,
+                                animationSpec = tween(700)
+                            )
+                        else -> null
+                    }
+
+                },
+                exitTransition = {
+                    when (targetState.destination.route) {
+                        BoardsList.name ->
+                            slideOutOfContainer(
+                                towards = AnimatedContentScope.SlideDirection.Right,
+                                animationSpec = tween(700)
+                            )
+                        Settings.name ->
+                            slideOutOfContainer(
+                                towards = AnimatedContentScope.SlideDirection.Left,
+                                animationSpec = tween(700)
+                            )
+                        else -> null
+                    }
                 }
-            }
+            ) { ContentWithBottomNavBar { BoardScreenContentPreview(it) } }
 
             composable(
                 Settings.name,
@@ -142,15 +178,11 @@ fun BankanApp() {
                 },
                 exitTransition = {
                     slideOutOfContainer(
-                        towards = AnimatedContentScope.SlideDirection.Left,
+                        towards = AnimatedContentScope.SlideDirection.Right,
                         animationSpec = tween(700)
                     )
                 }
-            ) {
-                ContentWithBottomNavBar(navController = navController) {
-                    Screen()
-                }
-            }
+            ) { ContentWithBottomNavBar { Screen(it) } }
         }
     }
 }
@@ -158,11 +190,11 @@ fun BankanApp() {
 
 @Preview
 @Composable
-private fun Screen() {
+private fun Screen(modifier: Modifier = Modifier) {
     BankanTheme {
         // A surface container using the 'background' color from the theme
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             color = MaterialTheme.colors.background
         ) {
             Column {
