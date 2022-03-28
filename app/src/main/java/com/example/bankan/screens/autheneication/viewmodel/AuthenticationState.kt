@@ -8,7 +8,7 @@ data class AuthenticationState(
     val passwordRequirements: List<PasswordRequirements> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val authenticated: Boolean = false,
+    val isAuthenticated: Boolean = false,
 ) {
     fun isFormValid(): Boolean =
         (password.isNotEmpty() && email.isNotEmpty() &&

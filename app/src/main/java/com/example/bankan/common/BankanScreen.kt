@@ -9,6 +9,6 @@ enum class BankanScreen {
         fun fromRoute(route: String?): BankanScreen =
             route?.substringBefore("/")?.let {
                 association[it] ?: throw IllegalArgumentException("Route $route is not recognized.")
-            } ?: Authentication
+            } ?: BoardsList
     }
 }

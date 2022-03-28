@@ -29,13 +29,15 @@ import androidx.compose.ui.unit.sp
 import com.example.bankan.R
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.autheneication.viewmodel.*
+import org.koin.androidx.compose.viewModel
 
 
 @Preview(showBackground = true)
 @Composable
 fun Authentication(onAppEnter: () -> Unit = {}) {
-    val viewModel: AuthenticationViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val viewModel: AuthenticationViewModel by viewModel()
     val uiState by viewModel.uiState.collectAsState()
+
     BankanTheme {
         AuthenticationContent(
             modifier = Modifier.fillMaxWidth(),
@@ -53,6 +55,7 @@ fun AuthenticationContent(
     handleEvent: (event: AuthenticationEvent) -> Unit,
     appEnter: () -> Unit
 ) {
+    val vm: AuthenticationViewModel by viewModel()
     BankanTheme {
         Box(
             modifier = modifier,
@@ -80,7 +83,7 @@ fun AuthenticationContent(
                     },
                     onAuthenticate = {
                         handleEvent(AuthenticationEvent.Authenticate)
-                        if (authenticationState.authenticated)
+                        if (vm.uiState.value.isAuthenticated)
                             appEnter()
                     },
                     onToggleMode = {
@@ -154,7 +157,9 @@ fun AuthenticationForm(
                                 modifier = Modifier.fillMaxWidth(),
                                 nickname = nickname,
                                 onNicknameChanged = onNicknameChanged,
-                                onNextClicked = { emailFocusRequester.requestFocus() }
+                                isNext = authenticationMode == AuthenticationMode.SIGN_UP,
+                                onNextClicked = { emailFocusRequester.requestFocus() },
+                                onDoneClicked = onAuthenticate
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }
@@ -431,29 +436,24 @@ fun NicknameInput(
     modifier: Modifier = Modifier,
     nickname: String,
     onNicknameChanged: (email: String) -> Unit,
-    onNextClicked: () -> Unit
+    isNext: Boolean,
+    onNextClicked: () -> Unit,
+    onDoneClicked: () -> Unit
 ) {
     BankanTheme {
         TextField(
             modifier = modifier,
             value = nickname,
             keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
+                imeAction = if (isNext) ImeAction.Next else ImeAction.Done,
                 keyboardType = KeyboardType.Text
             ),
             keyboardActions = KeyboardActions(
-                onNext = {
-                    onNextClicked()
-                }
+                onNext = { onNextClicked() },
+                onDone = { onDoneClicked() }
             ),
-            onValueChange = { newNickname ->
-                onNicknameChanged(newNickname)
-            },
-            label = {
-                Text(
-                    text = stringResource(R.string.label_nickname)
-                )
-            },
+            onValueChange = { onNicknameChanged(it) },
+            label = { Text(text = stringResource(R.string.label_nickname)) },
             singleLine = true,
             leadingIcon = {
                 Icon(
@@ -517,23 +517,15 @@ fun AuthenticationButton(
     BankanTheme {
         Button(
             modifier = modifier,
-            onClick = {
-                onAuthenticate()
-            },
+            onClick = onAuthenticate,
             enabled = enableAuthentication
         ) {
             Text(
                 text = stringResource(
                     when (authenticationMode) {
-                        AuthenticationMode.SIGN_IN -> {
-                            R.string.action_sign_in
-                        }
-                        AuthenticationMode.SIGN_UP -> {
-                            R.string.action_sign_up
-                        }
-                        AuthenticationMode.GUEST -> {
-                            R.string.continue_as_guest
-                        }
+                        AuthenticationMode.SIGN_IN -> R.string.action_sign_in
+                        AuthenticationMode.SIGN_UP -> R.string.action_sign_up
+                        AuthenticationMode.GUEST -> R.string.continue_as_guest
                     }
                 )
             )

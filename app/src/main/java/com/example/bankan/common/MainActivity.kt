@@ -3,6 +3,9 @@ package com.example.bankan.common
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
@@ -11,14 +14,9 @@ import androidx.compose.material.icons.outlined.DeveloperBoard
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SpaceDashboard
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.bankan.common.BankanScreen.*
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.autheneication.ui.Authentication
@@ -26,101 +24,132 @@ import com.example.bankan.screens.board.ui.BoardScreenContentPreview
 import com.example.bankan.screens.board.ui.CardExample
 import com.example.bankan.screens.board.ui.ListPreview
 import com.example.bankan.screens.main.ui.BoardListPreview
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            BankanApp()
+            BankanTheme {
+                BankanApp()
+//                ExperimentalAnimationNav()
+            }
         }
     }
 }
+
 
 // TODO clean project structure
 // TODO make main screens templates
 // TODO set animations on navigation
 
-
 @Composable
-fun BankanApp() {
-    BankanTheme {
-        val navController = rememberNavController()
-        val backstackEntry by navController.currentBackStackEntryAsState()
-        val currentScreen = BankanScreen.fromRoute(backstackEntry?.destination?.route)
-
-        BankanNavHost(navController, currentScreen)
-    }
-}
-
-@Composable
-fun ContentWithBottomNavBar(
+fun ContentWithBottomNavBarImpl(
     modifier: Modifier = Modifier,
     onBoardsListClicked: () -> Unit,
     onBoardClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
     centerContent: @Composable () -> Unit
 ) {
-    Scaffold(modifier = modifier, bottomBar = {
-        BottomAppBar {
-            IconButton(onClick = onBoardsListClicked) {
-                Icon(Icons.Outlined.SpaceDashboard, contentDescription = "List of Boards")
+    Scaffold(modifier = modifier,
+        bottomBar = {
+            BottomAppBar {
+                IconButton(modifier = Modifier.weight(1f), onClick = onBoardsListClicked) {
+                    Icon(Icons.Outlined.SpaceDashboard, contentDescription = "List of Boards")
+                }
+                IconButton(modifier = Modifier.weight(1f), onClick = onBoardClicked) {
+                    Icon(Icons.Outlined.DeveloperBoard, contentDescription = "Board")
+                }
+                IconButton(modifier = Modifier.weight(1f), onClick = onSettingsClicked) {
+                    Icon(Icons.Outlined.Settings, contentDescription = "Settings")
+                }
             }
-            IconButton(onClick = onBoardClicked) {
-                Icon(Icons.Outlined.DeveloperBoard, contentDescription = "Board")
-            }
-            IconButton(onClick = onSettingsClicked) {
-                Icon(Icons.Outlined.Settings, contentDescription = "Settings")
-            }
-        }
-    }) {
-        centerContent()
-    }
+        }) { centerContent() }
 }
 
+
 @Composable
-fun BankanNavHost(
+fun ContentWithBottomNavBar(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination: BankanScreen,
-    modifier: Modifier = Modifier
+    content: @Composable () -> Unit
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = startDestination.name,
-        modifier = modifier
-    ) {
-        @Composable
-        fun ContentWithBottomNavBar_(
-            modifier: Modifier = Modifier,
-            content: @Composable () -> Unit
+    ContentWithBottomNavBarImpl(
+        onBoardsListClicked = { navController.navigate(route = BoardsList.name) },
+        onBoardClicked = { navController.navigate(route = Board.name) },
+        onSettingsClicked = { navController.navigate(route = Settings.name) },
+        centerContent = content
+    )
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun BankanApp() {
+    BankanTheme {
+        val navController = rememberAnimatedNavController()
+        val backstackEntry = navController.currentBackStackEntry
+        val currentScreen = BankanScreen.fromRoute(backstackEntry?.destination?.route)
+
+        AnimatedNavHost(
+            navController = navController,
+            startDestination = currentScreen.name,
         ) {
-            ContentWithBottomNavBar(
-                onBoardsListClicked = { navController.navigate(route = BoardsList.name) },
-                onBoardClicked = { navController.navigate(route = Board.name) },
-                onSettingsClicked = { navController.navigate(route = Settings.name) },
-                centerContent = content
-            )
-        }
-        composable(Authentication.name) {
-            Authentication(onAppEnter = {
-                navController.navigate(route = BoardsList.name)
-            })
-        }
-
-        composable(Board.name) {
-            ContentWithBottomNavBar_ {
-                BoardScreenContentPreview()
+            composable(Authentication.name) {
+                Authentication(onAppEnter = {
+                    navController.navigate(route = BoardsList.name)
+                })
             }
-        }
 
-        composable(BoardsList.name) {
-            ContentWithBottomNavBar_ {
-                BoardListPreview()
+            composable(BoardsList.name,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    )
+                }
+            ) {
+                ContentWithBottomNavBar(navController = navController) {
+                    BoardListPreview()
+                }
             }
-        }
 
-        composable(Settings.name) {
-            ContentWithBottomNavBar_ {
-                Screen()
+            composable(
+                Board.name,
+            ) {
+                ContentWithBottomNavBar(navController = navController) {
+                    BoardScreenContentPreview()
+                }
+            }
+
+            composable(
+                Settings.name,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    )
+                }
+            ) {
+                ContentWithBottomNavBar(navController = navController) {
+                    Screen()
+                }
             }
         }
     }

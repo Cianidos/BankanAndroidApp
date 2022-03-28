@@ -54,7 +54,7 @@ class AuthenticationViewModel : ViewModel() {
 
     private fun authenticate() {
         when (_uiState.value.authenticationMode) {
-            AuthenticationMode.GUEST -> _uiState.value = _uiState.value.copy(authenticated = true)
+            AuthenticationMode.GUEST -> _uiState.value = _uiState.value.copy(isAuthenticated = true)
 //            AuthenticationMode.SIGN_UP -> TODO()
 //            AuthenticationMode.SIGN_IN -> TODO()
             else -> {
