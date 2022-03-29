@@ -1,4 +1,4 @@
-package com.example.bankan.screens.main.ui
+package com.example.bankan.screens.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

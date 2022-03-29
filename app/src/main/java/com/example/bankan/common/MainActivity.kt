@@ -24,7 +24,7 @@ import com.example.bankan.screens.autheneication.ui.Authentication
 import com.example.bankan.screens.board.ui.BoardScreenContentPreview
 import com.example.bankan.screens.board.ui.CardExample
 import com.example.bankan.screens.board.ui.ListPreview
-import com.example.bankan.screens.main.ui.BoardListPreview
+import com.example.bankan.screens.main.ui.MultitouchExamplesPreview
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
@@ -131,7 +131,7 @@ fun NavHostContainer(
                         animationSpec = tween(700)
                     )
                 }
-            ) { ContentWithBottomNavBar { BoardListPreview(it) } }
+            ) { ContentWithBottomNavBar { MultitouchExamplesPreview(it) } }
 
             composable(
                 Board.name,

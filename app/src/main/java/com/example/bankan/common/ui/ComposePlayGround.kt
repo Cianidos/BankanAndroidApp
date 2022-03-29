@@ -1,4 +1,4 @@
-package com.example.bankan.common
+package com.example.bankan.common.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
