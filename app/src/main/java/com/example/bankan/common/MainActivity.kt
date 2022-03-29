@@ -44,10 +44,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// TODO make data layer, extract data, repositories and etc to separated module
+// TODO finish MainMenu
+// TODO make board screen usable
+// TODO make room/delight database
+// TODO make repositories (maybe fake firstly)
+// TODO choose dependencies strategy hoisting vs inject viewModel everywhere
 
-// TODO clean project structure
-// TODO make main screens templates
-// TODO set animations on navigation
 
 @Composable
 fun ContentWithBottomNavBarImpl(
