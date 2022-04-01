@@ -1,12 +1,9 @@
 package com.example.bankan.screens.main.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.bankan.screens.board.data.BoardInfo
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -17,7 +14,9 @@ interface BoardInfoRepository {
 }
 
 class FakeBoardInfoRepository : BoardInfoRepository {
-    val list: MutableList<BoardInfo> = mutableListOf(BoardInfo(name = "One"), BoardInfo(name = "Two"))
+    private val list: MutableList<BoardInfo> =
+        mutableListOf(BoardInfo(name = "One"), BoardInfo(name = "Two"))
+
     override fun getAllBoards(): List<BoardInfo> {
         return list
     }
@@ -27,10 +26,17 @@ class FakeBoardInfoRepository : BoardInfoRepository {
     }
 
     override fun deleteBoard(index: Int) {
+        list.removeAt(index = index)
     }
 }
 
-enum class MainMenuStates {
+data class MainMenuUiModel(
+    val state: MainMenuUiStates,
+    val boardInfoList: List<BoardInfo>,
+    val newBoardName: String
+)
+
+enum class MainMenuUiStates {
     View, Loading, EnteringName
 }
 
@@ -38,49 +44,43 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
 
     private val boardInfoRepository: BoardInfoRepository by inject()
 
-    private val _state = MutableStateFlow(MainMenuStates.Loading)
-    val state = _state.asStateFlow()
-
-    private val _boardInfoList =
-        MutableStateFlow<List<BoardInfo>>(listOf())
-    val boardInfoList = _boardInfoList.asStateFlow()
-
-    private val _newBoardName = MutableStateFlow("")
-    val newBoardName = _newBoardName.asStateFlow()
-
-    init {
-        loadBoards()
-    }
+    private val _uiModel = MutableStateFlow(
+        MainMenuUiModel(
+            MainMenuUiStates.View,
+            boardInfoRepository.getAllBoards(),
+            ""
+        )
+    )
+    val uiModel = _uiModel.asStateFlow()
 
     fun loadBoards() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val boards = boardInfoRepository.getAllBoards()
-            _state.value = MainMenuStates.View
-            _boardInfoList.value = boards
-        }
+        _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.Loading)
+        val boards = boardInfoRepository.getAllBoards()
+        _uiModel.value = _uiModel.value.copy(boardInfoList = boards, state = MainMenuUiStates.View)
     }
 
     fun createNewBoard() {
-        _state.value = MainMenuStates.EnteringName
+        _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.EnteringName)
     }
 
     fun changeNewBoardName(updatedName: String) {
-        _newBoardName.value = updatedName
+        _uiModel.value = _uiModel.value.copy(newBoardName = updatedName)
     }
 
     fun submitNewBoard() {
-        _state.value = MainMenuStates.View
-        boardInfoRepository.addBoard(BoardInfo(_newBoardName.value))
-        _newBoardName.value = ""
+        _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.View)
+        boardInfoRepository.addBoard(BoardInfo(_uiModel.value.newBoardName))
+        _uiModel.value = _uiModel.value.copy(newBoardName = "")
+        loadBoards()
     }
 
     fun discardNewBoard() {
-        _state.value = MainMenuStates.View
-        _newBoardName.value = ""
+        _uiModel.value = _uiModel.value.copy(newBoardName = "", state = MainMenuUiStates.View)
     }
 
     fun deleteBoard(index: Int) {
         boardInfoRepository.deleteBoard(index)
+        loadBoards()
     }
 }
 

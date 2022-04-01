@@ -27,25 +27,32 @@ import com.example.bankan.common.ui.components.DashOutline
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.board.data.BoardInfo
-import com.example.bankan.screens.main.viewmodel.MainMenuStates
+import com.example.bankan.screens.main.viewmodel.MainMenuUiModel
+import com.example.bankan.screens.main.viewmodel.MainMenuUiStates
 import com.example.bankan.screens.main.viewmodel.MainMenuViewModel
 import org.koin.androidx.compose.viewModel
 
 @Composable
 fun MainMenu(modifier: Modifier = Modifier, onBoardChosen: (boardId: Int) -> Unit) {
     val vm: MainMenuViewModel by viewModel()
-    val boardInfoList by vm.boardInfoList.collectAsState()
+    val uiModel = vm.uiModel.collectAsState().value
     MainMenuContent(
         onBoardChosen = onBoardChosen,
-        boardList = boardInfoList
+        uiModel = uiModel,
+        onCreateNewBoard = { vm.createNewBoard() },
+        onChangeNewBoardName = { vm.changeNewBoardName(it) },
+        onSubmitNewBoard = { vm.submitNewBoard() }
     )
 }
 
 @Composable
 fun MainMenuContent(
     modifier: Modifier = Modifier,
+    uiModel: MainMenuUiModel,
     onBoardChosen: (boardId: Int) -> Unit,
-    boardList: List<BoardInfo>
+    onCreateNewBoard: () -> Unit,
+    onChangeNewBoardName: (String) -> Unit,
+    onSubmitNewBoard: () -> Unit,
 ) {
     val vm: MainMenuViewModel by viewModel()
     BankanTheme {
@@ -54,8 +61,11 @@ fun MainMenuContent(
             .clickable { vm.discardNewBoard() }) {
             BoardList(
                 modifier = modifier,
-                list = boardList,
-                onBoardChosen = onBoardChosen
+                uiModel = uiModel,
+                onBoardChosen = onBoardChosen,
+                onSubmitNewBoard = onSubmitNewBoard,
+                onChangeNewBoardName = onChangeNewBoardName,
+                onCreateNewBoard = onCreateNewBoard
             )
         }
     }
@@ -64,13 +74,16 @@ fun MainMenuContent(
 @Composable
 fun BoardList(
     modifier: Modifier = Modifier,
-    list: List<BoardInfo>,
+    uiModel: MainMenuUiModel,
     onBoardChosen: (boardId: Int) -> Unit,
+    onCreateNewBoard: () -> Unit,
+    onChangeNewBoardName: (String) -> Unit,
+    onSubmitNewBoard: () -> Unit,
 ) {
     val vm: MainMenuViewModel by viewModel()
 
     LazyColumn(modifier = modifier) {
-        eachAndBetween(data = list.withIndex().toList()) {
+        eachAndBetween(data = uiModel.boardInfoList.withIndex().toList()) {
             BoardCard(
                 boardInfo = it.value,
                 onBoardChosen = { onBoardChosen(it.index) },
@@ -84,7 +97,12 @@ fun BoardList(
             )
         }
         item {
-            CreateNewBoard()
+            CreateNewBoard(
+                uiModel = uiModel,
+                onCreateNewBoard = onCreateNewBoard,
+                onChangeNewBoardName = onChangeNewBoardName,
+                onSubmitNewBoard = onSubmitNewBoard
+            )
         }
     }
 }
@@ -128,31 +146,34 @@ fun BoardCard(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun CreateNewBoard(modifier: Modifier = Modifier) {
-    val vm: MainMenuViewModel by viewModel()
-    val state by vm.state.collectAsState()
-    val newBoardName by vm.newBoardName.collectAsState()
+fun CreateNewBoard(
+    modifier: Modifier = Modifier,
+    uiModel: MainMenuUiModel,
+    onCreateNewBoard: () -> Unit,
+    onChangeNewBoardName: (String) -> Unit,
+    onSubmitNewBoard: () -> Unit
+) {
     val tfFr = remember { FocusRequester() }
 
     DashOutline(modifier = modifier) {
         Column {
-            AnimatedVisibility(visible = state == MainMenuStates.View) {
-                IconButton(onClick = { vm.createNewBoard() }) {
+            AnimatedVisibility(visible = uiModel.state == MainMenuUiStates.View) {
+                IconButton(onClick = { onCreateNewBoard() }) {
                     Icon(Icons.Outlined.Add, contentDescription = "Create New Board")
                 }
             }
-            AnimatedVisibility(visible = state == MainMenuStates.EnteringName) {
+            AnimatedVisibility(visible = uiModel.state == MainMenuUiStates.EnteringName) {
                 TextField(
                     modifier = Modifier
                         .focusRequester(tfFr)
                         .onPlaced { tfFr.requestFocus() },
-                    value = newBoardName,
-                    onValueChange = { vm.changeNewBoardName(it) },
+                    value = uiModel.newBoardName,
+                    onValueChange = { onChangeNewBoardName(it) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Done,
                     ),
-                    keyboardActions = KeyboardActions(onDone = { vm.submitNewBoard() })
+                    keyboardActions = KeyboardActions(onDone = { onSubmitNewBoard() })
                 )
             }
         }
