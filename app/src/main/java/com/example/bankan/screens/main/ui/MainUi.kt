@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.DashOutline
 import com.example.bankan.common.ui.eachAndBetween
@@ -31,6 +32,7 @@ import com.example.bankan.screens.main.viewmodel.MainMenuUiModel
 import com.example.bankan.screens.main.viewmodel.MainMenuUiStates
 import com.example.bankan.screens.main.viewmodel.MainMenuViewModel
 import org.koin.androidx.compose.viewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun MainMenu(modifier: Modifier = Modifier, onBoardChosen: (boardId: Int) -> Unit) {
@@ -84,13 +86,10 @@ fun BoardList(
 
     LazyColumn(modifier = modifier) {
         eachAndBetween(data = uiModel.boardInfoList.withIndex().toList()) {
-            SwipeableBoardCard(text = it.value.name) {
-                vm.deleteBoard(it.index)
-            }
-//            BoardCard(
-//                boardInfo = it.value,
-//                onBoardChosen = { onBoardChosen(it.index) },
-//                onDelete = { vm.deleteBoard(it.index) })
+            BoardCard(
+                boardInfo = it.value,
+                onBoardChosen = { onBoardChosen(it.index) },
+                onDelete = { vm.deleteBoard(it.index) })
         }
         item {
             Spacer(
@@ -139,9 +138,12 @@ fun BoardCard(
             )
             .background(Color.Transparent)
     ) {
-        Card(modifier = modifier.onGloballyPositioned {
-            contentSize = Size(it.size.width.toFloat(), it.size.height.toFloat())
-        }, onClick = onBoardChosen) {
+        Card(modifier = modifier
+            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+            .onGloballyPositioned {
+                contentSize = Size(it.size.width.toFloat(), it.size.height.toFloat())
+            }, onClick = onBoardChosen
+        ) {
             Text(text = boardInfo.name)
         }
     }
