@@ -14,7 +14,7 @@ interface BoardInfoRepository {
 }
 
 class FakeBoardInfoRepository : BoardInfoRepository {
-    private val list: MutableList<BoardInfo> =
+    private var list: List<BoardInfo> =
         mutableListOf(BoardInfo(name = "One"), BoardInfo(name = "Two"))
 
     override fun getAllBoards(): List<BoardInfo> {
@@ -22,11 +22,11 @@ class FakeBoardInfoRepository : BoardInfoRepository {
     }
 
     override fun addBoard(boardInfo: BoardInfo) {
-        list.add(boardInfo)
+        list = list + boardInfo
     }
 
     override fun deleteBoard(index: Int) {
-        list.removeAt(index = index)
+        list = list.toMutableList().apply { removeAt(index = index) }
     }
 }
 
@@ -53,7 +53,7 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
     )
     val uiModel = _uiModel.asStateFlow()
 
-    fun loadBoards() {
+    private fun loadBoards() {
         _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.Loading)
         val boards = boardInfoRepository.getAllBoards()
         _uiModel.value = _uiModel.value.copy(boardInfoList = boards, state = MainMenuUiStates.View)

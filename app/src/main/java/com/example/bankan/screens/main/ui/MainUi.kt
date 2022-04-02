@@ -35,7 +35,7 @@ import org.koin.androidx.compose.viewModel
 @Composable
 fun MainMenu(modifier: Modifier = Modifier, onBoardChosen: (boardId: Int) -> Unit) {
     val vm: MainMenuViewModel by viewModel()
-    val uiModel = vm.uiModel.collectAsState().value
+    val uiModel by vm.uiModel.collectAsState()
     MainMenuContent(
         onBoardChosen = onBoardChosen,
         uiModel = uiModel,
@@ -84,10 +84,13 @@ fun BoardList(
 
     LazyColumn(modifier = modifier) {
         eachAndBetween(data = uiModel.boardInfoList.withIndex().toList()) {
-            BoardCard(
-                boardInfo = it.value,
-                onBoardChosen = { onBoardChosen(it.index) },
-                onDelete = { vm.deleteBoard(it.index) })
+            SwipeableBoardCard(text = it.value.name) {
+                vm.deleteBoard(it.index)
+            }
+//            BoardCard(
+//                boardInfo = it.value,
+//                onBoardChosen = { onBoardChosen(it.index) },
+//                onDelete = { vm.deleteBoard(it.index) })
         }
         item {
             Spacer(
