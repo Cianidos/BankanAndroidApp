@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// TODO make data layer, extract data, repositories and etc to separated module
+// TODO make content layer, extract content, repositories and etc to separated module
 // TODO finish MainMenu
 // TODO make board screen usable
 // TODO make room/delight database

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.DashOutline
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
-import com.example.bankan.screens.board.data.BoardInfo
+import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.screens.main.viewmodel.MainMenuUiModel
 import com.example.bankan.screens.main.viewmodel.MainMenuUiStates
 import com.example.bankan.screens.main.viewmodel.MainMenuViewModel

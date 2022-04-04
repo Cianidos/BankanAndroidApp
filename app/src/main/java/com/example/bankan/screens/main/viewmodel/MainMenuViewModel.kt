@@ -1,7 +1,7 @@
 package com.example.bankan.screens.main.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.bankan.screens.board.data.BoardInfo
+import com.example.bankan.data.models.BoardInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.KoinComponent
@@ -69,7 +69,7 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
 
     fun submitNewBoard() {
         _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.View)
-        boardInfoRepository.addBoard(BoardInfo(_uiModel.value.newBoardName))
+        boardInfoRepository.addBoard(BoardInfo(name = _uiModel.value.newBoardName))
         _uiModel.value = _uiModel.value.copy(newBoardName = "")
         loadBoards()
     }
