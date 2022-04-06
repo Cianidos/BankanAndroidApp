@@ -5,4 +5,6 @@ import org.koin.core.component.KoinComponent
 
 class UiState { }
 
-class BoardScreenViewModel : ViewModel(), KoinComponent { }
+class BoardScreenViewModel : ViewModel(), KoinComponent {
+
+}

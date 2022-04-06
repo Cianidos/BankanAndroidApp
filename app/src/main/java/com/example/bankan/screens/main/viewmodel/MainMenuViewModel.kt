@@ -38,7 +38,7 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            boardInfoRepository.getAllBoards().distinctUntilChanged().collect {
+            boardInfoRepository.getAll().distinctUntilChanged().collect {
                 _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.Loading)
                 _uiModel.value = _uiModel.value.copy(boardInfoList = it, state = MainMenuUiStates.View)
             }
@@ -56,7 +56,7 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
     fun submitNewBoard() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.View)
-            boardInfoRepository.addBoard(BoardInfo(name = _uiModel.value.newBoardName))
+            boardInfoRepository.add(BoardInfo(name = _uiModel.value.newBoardName))
             _uiModel.value = _uiModel.value.copy(newBoardName = "")
         }
     }
@@ -67,7 +67,7 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
 
     fun deleteBoard(index: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            boardInfoRepository.deleteBoard(index)
+            boardInfoRepository.delete(index)
         }
     }
 }

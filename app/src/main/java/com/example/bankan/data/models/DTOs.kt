@@ -24,6 +24,7 @@ data class ListInfo(
     val name: String,
     val description: String = "",
 
+    val boardId: Int = -1,
     val id: Int? = null,
     @PrimaryKey(autoGenerate = true) val localId: Int? = null,
 )
@@ -33,6 +34,7 @@ data class CardInfo(
     val name: String,
     val description: String = "",
 
+    val listId: Int = -1,
     val id: Int? = null,
     @PrimaryKey(autoGenerate = true) val localId: Int? = null,
 )
