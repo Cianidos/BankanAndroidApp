@@ -17,20 +17,24 @@ fun BoardScreenContentPreview(modifier: Modifier = Modifier) {
     val listData = ListData(
         ListInfo(name = "List list"),
         listOf(
-            CardInfo(name = "SomeName1", description = "Some Long Description bla bla bla, ha ha ha"),
+            CardInfo(
+                name = "SomeName1",
+                description = "Some Long Description bla bla bla, ha ha ha"
+            ),
             CardInfo(name = "", description = "Some Long Description"),
             CardInfo(name = "SomeName3", description = "Some Long Description")
         )
     )
-    BoardScreenContent(
-        data = BoardData(
-            BoardInfo(name = "My Board"), listOf(
-                listData,
-                listData.copy(content = listData.content.toMutableList().apply { removeAt(1) }),
-                listData.copy(info = ListInfo(name = "To List or Not To List")),
-                listData.copy(content = listData.content + listData.content + listData.content)
-            )
+    val bd = BoardData(
+        BoardInfo(name = "My Board"), listOf(
+            listData,
+            listData.copy(content = listData.content.toMutableList().apply { removeAt(1) }),
+            listData.copy(info = ListInfo(name = "To List or Not To List")),
+            listData.copy(content = listData.content + listData.content + listData.content)
         )
+    )
+    BoardScreenContent(
+        data = bd
     )
 }
 

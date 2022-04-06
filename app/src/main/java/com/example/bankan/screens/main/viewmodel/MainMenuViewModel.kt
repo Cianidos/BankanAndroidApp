@@ -1,34 +1,16 @@
 package com.example.bankan.screens.main.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.bankan.data.models.BoardInfo
+import com.example.bankan.data.repository.BoardInfoRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-
-interface BoardInfoRepository {
-    fun getAllBoards(): List<BoardInfo>
-    fun addBoard(boardInfo: BoardInfo)
-    fun deleteBoard(index: Int)
-}
-
-class FakeBoardInfoRepository : BoardInfoRepository {
-    private var list: List<BoardInfo> =
-        mutableListOf(BoardInfo(name = "One"), BoardInfo(name = "Two"))
-
-    override fun getAllBoards(): List<BoardInfo> {
-        return list
-    }
-
-    override fun addBoard(boardInfo: BoardInfo) {
-        list = list + boardInfo
-    }
-
-    override fun deleteBoard(index: Int) {
-        list = list.toMutableList().apply { removeAt(index = index) }
-    }
-}
 
 data class MainMenuUiModel(
     val state: MainMenuUiStates,
@@ -47,16 +29,20 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
     private val _uiModel = MutableStateFlow(
         MainMenuUiModel(
             MainMenuUiStates.View,
-            boardInfoRepository.getAllBoards(),
+            listOf(),
             ""
         )
     )
+
     val uiModel = _uiModel.asStateFlow()
 
-    private fun loadBoards() {
-        _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.Loading)
-        val boards = boardInfoRepository.getAllBoards()
-        _uiModel.value = _uiModel.value.copy(boardInfoList = boards, state = MainMenuUiStates.View)
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            boardInfoRepository.getAllBoards().distinctUntilChanged().collect {
+                _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.Loading)
+                _uiModel.value = _uiModel.value.copy(boardInfoList = it, state = MainMenuUiStates.View)
+            }
+        }
     }
 
     fun createNewBoard() {
@@ -68,10 +54,11 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
     }
 
     fun submitNewBoard() {
-        _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.View)
-        boardInfoRepository.addBoard(BoardInfo(name = _uiModel.value.newBoardName))
-        _uiModel.value = _uiModel.value.copy(newBoardName = "")
-        loadBoards()
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.View)
+            boardInfoRepository.addBoard(BoardInfo(name = _uiModel.value.newBoardName))
+            _uiModel.value = _uiModel.value.copy(newBoardName = "")
+        }
     }
 
     fun discardNewBoard() {
@@ -79,8 +66,9 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
     }
 
     fun deleteBoard(index: Int) {
-        boardInfoRepository.deleteBoard(index)
-        loadBoards()
+        viewModelScope.launch(Dispatchers.IO) {
+            boardInfoRepository.deleteBoard(index)
+        }
     }
 }
 

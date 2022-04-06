@@ -2,14 +2,19 @@ package com.example.bankan.screens.autheneication.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bankan.data.repository.ProfileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class AuthenticationViewModel : ViewModel() {
+class AuthenticationViewModel : KoinComponent, ViewModel() {
+
+    private val profileRepository: ProfileRepository by inject()
 
     private val _uiState = MutableStateFlow(AuthenticationState())
     val uiState = _uiState.asStateFlow()
@@ -54,7 +59,12 @@ class AuthenticationViewModel : ViewModel() {
 
     private fun authenticate() {
         when (_uiState.value.authenticationMode) {
-            AuthenticationMode.GUEST -> _uiState.value = _uiState.value.copy(isAuthenticated = true)
+            AuthenticationMode.GUEST -> {
+                _uiState.value = _uiState.value.copy(isAuthenticated = true)
+                viewModelScope.launch(Dispatchers.IO) {
+                    profileRepository.continueAsGuest(_uiState.value.nickname)
+                }
+            }
 //            AuthenticationMode.SIGN_UP -> TODO()
 //            AuthenticationMode.SIGN_IN -> TODO()
             else -> {

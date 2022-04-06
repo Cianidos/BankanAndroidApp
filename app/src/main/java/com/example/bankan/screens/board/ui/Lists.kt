@@ -60,7 +60,7 @@ fun List1(data: ListData) {
                     .background(Color.Gray, RoundedCornerShape(20.dp))
                     .fillMaxWidth()
             )
-            data.content.forEach { (_, name, description) ->
+            data.content.forEach { (name, description) ->
                 Spacer(modifier = Modifier.height(10.dp))
                 if (name.isNotEmpty())
                     Card(name = name, description = description)
@@ -89,7 +89,7 @@ fun List2(data: ListData) {
                 modifier = Modifier
                     .background(Color.Gray, RoundedCornerShape(20.dp))
             )
-            data.content.forEach { (_, name, description) ->
+            data.content.forEach { (name, description) ->
                 Spacer(modifier = Modifier.height(10.dp))
                 if (name.isNotEmpty())
                     Card(name = name, description = description)

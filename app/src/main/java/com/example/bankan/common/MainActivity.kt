@@ -15,10 +15,13 @@ import androidx.compose.material.icons.outlined.DeveloperBoard
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SpaceDashboard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import com.example.bankan.common.BankanScreen.*
+import com.example.bankan.common.BankanScreen.Authentication
+import com.example.bankan.common.BankanScreen.Main
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.autheneication.ui.Authentication
 import com.example.bankan.screens.board.ui.BoardScreenContentPreview
@@ -27,8 +30,8 @@ import com.example.bankan.screens.board.ui.ListPreview
 import com.example.bankan.screens.main.ui.MainMenu
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import org.koin.androidx.compose.viewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -44,7 +47,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// TODO make content layer, extract content, repositories and etc to separated module
 // TODO finish MainMenu
 // TODO make board screen usable
 // TODO make room/delight database
@@ -81,12 +83,17 @@ fun ContentWithBottomNavBarImpl(
 @Composable
 fun BankanApp() {
     BankanTheme {
+        val vm: NavigationViewModel by viewModel()
+        val state: MainState by vm.state.collectAsState()
         val navController = rememberAnimatedNavController()
-        val backstackEntry = navController.currentBackStackEntry
-        val currentScreen = BankanScreen.fromRoute(backstackEntry?.destination?.route)
+        val currentScreen = when(state){
+            MainState.Authorized.Guest -> Main.BoardsList
+            MainState.Authorized.LoggedIn -> Main.BoardsList
+            MainState.Loading -> BankanScreen.Loading
+            MainState.NotAuthorized -> Authentication
+        }
 
         NavHostContainer(navController = navController, currentScreen = currentScreen)
-        val d = 1 + 1
     }
 }
 
@@ -103,9 +110,9 @@ fun NavHostContainer(
         content: @Composable (Modifier) -> Unit
     ) {
         ContentWithBottomNavBarImpl(
-            onBoardsListClicked = { navController.navigate(route = BoardsList.name) },
-            onBoardClicked = { navController.navigate(route = Board.name) },
-            onSettingsClicked = { navController.navigate(route = Settings.name) },
+            onBoardsListClicked = { navController.navigate(route = Main.BoardsList.name) },
+            onBoardClicked = { navController.navigate(route = Main.Board.name) },
+            onSettingsClicked = { navController.navigate(route = Main.Settings.name) },
             centerContent = content
         )
     }
@@ -116,12 +123,18 @@ fun NavHostContainer(
     ) {
         composable(Authentication.name) {
             Authentication(modifier) {
-                navController.navigate(route = "Main")
+                navController.navigate(route = Main.BoardsList.name)
+            }
+        }
+        composable(BankanScreen.Loading.name)  {
+            BankanTheme {
+                CircularProgressIndicator()
             }
         }
 
-        navigation(BoardsList.name, "Main") {
-            composable(BoardsList.name,
+        //navigation(Main.BoardsList.name, "Main") {
+            composable(
+                Main.BoardsList.name,
                 enterTransition = {
                     slideIntoContainer(
                         towards = AnimatedContentScope.SlideDirection.Right,
@@ -134,18 +147,22 @@ fun NavHostContainer(
                         animationSpec = tween(700)
                     )
                 }
-            ) { ContentWithBottomNavBar { MainMenu(it) {} } }
+            ) {
+                ContentWithBottomNavBar {
+                    MainMenu(it) { }
+                }
+            }
 
             composable(
-                Board.name,
+                Main.Board.name,
                 enterTransition = {
                     when (initialState.destination.route) {
-                        BoardsList.name ->
+                        Main.BoardsList.name ->
                             slideIntoContainer(
                                 towards = AnimatedContentScope.SlideDirection.Left,
                                 animationSpec = tween(700)
                             )
-                        Settings.name ->
+                        Main.Settings.name ->
                             slideIntoContainer(
                                 towards = AnimatedContentScope.SlideDirection.Right,
                                 animationSpec = tween(700)
@@ -156,12 +173,12 @@ fun NavHostContainer(
                 },
                 exitTransition = {
                     when (targetState.destination.route) {
-                        BoardsList.name ->
+                        Main.BoardsList.name ->
                             slideOutOfContainer(
                                 towards = AnimatedContentScope.SlideDirection.Right,
                                 animationSpec = tween(700)
                             )
-                        Settings.name ->
+                        Main.Settings.name ->
                             slideOutOfContainer(
                                 towards = AnimatedContentScope.SlideDirection.Left,
                                 animationSpec = tween(700)
@@ -172,7 +189,7 @@ fun NavHostContainer(
             ) { ContentWithBottomNavBar { BoardScreenContentPreview(it) } }
 
             composable(
-                Settings.name,
+                Main.Settings.name,
                 enterTransition = {
                     slideIntoContainer(
                         towards = AnimatedContentScope.SlideDirection.Left,
@@ -186,7 +203,7 @@ fun NavHostContainer(
                     )
                 }
             ) { ContentWithBottomNavBar { Screen(it) } }
-        }
+        //}
     }
 }
 

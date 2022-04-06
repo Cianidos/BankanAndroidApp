@@ -1,15 +1,16 @@
 package com.example.bankan.common
 
-enum class BankanScreen {
-    Authentication, BoardsList, Board, Settings;
+sealed class BankanScreen {
+    val name: String = this::class.simpleName!!
+    val route: String =
+        this.javaClass.canonicalName!!.removePrefix("com.example.bankan.common.BankanScreen.")
+            .replace('.', '/')
 
-    companion object {
-        private val association = values().associateBy { it.name }
-
-        // TODO fix nest in Main
-        fun fromRoute(route: String?): BankanScreen =
-            route?.substringBefore("/")?.let {
-                association[it] ?: throw IllegalArgumentException("Route $route is not recognized.")
-            } ?: Authentication
+    object Authentication : BankanScreen()
+    object Loading : BankanScreen()
+    sealed class Main : BankanScreen() {
+        object BoardsList : Main()
+        object Board : Main()
+        object Settings : Main()
     }
 }
