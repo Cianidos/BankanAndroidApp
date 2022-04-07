@@ -38,8 +38,7 @@ fun BoardScreenContentPreview(modifier: Modifier = Modifier) {
         )
     )
     BoardScreenContent(
-        data = bd
-    )
+        data = bd, onAddNewCard = {}, onAddNewList = {})
 }
 
 @Composable
@@ -47,12 +46,22 @@ fun BoardScreen(modifier: Modifier = Modifier, boardId: Int?) {
     val vm: BoardScreenViewModel by viewModel()
     vm.setCurrentBoard(boardId!!)
     val data by vm.data.collectAsState()
-    BoardScreenContent(modifier = modifier, data = data)
+
+    BoardScreenContent(
+        modifier = modifier,
+        data = data,
+        onAddNewList = { vm.addNewList() },
+        onAddNewCard = { vm.addNewCard(it) })
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BoardScreenContent(modifier: Modifier = Modifier, data: BoardData) {
+fun BoardScreenContent(
+    modifier: Modifier = Modifier,
+    data: BoardData,
+    onAddNewList: () -> Unit,
+    onAddNewCard: (Int) -> Unit
+) {
     BankanTheme {
         LazyColumn {
             stickyHeader {
@@ -63,7 +72,10 @@ fun BoardScreenContent(modifier: Modifier = Modifier, data: BoardData) {
             item {
                 LazyRow(modifier = modifier) {
                     eachAndBetween(data = data.content) {
-                        List1(data = it)
+                        List1(data = it, onAddNewCard = onAddNewCard)
+                    }
+                    item {
+                        AddNewList(onAddNewList = onAddNewList)
                     }
                 }
             }

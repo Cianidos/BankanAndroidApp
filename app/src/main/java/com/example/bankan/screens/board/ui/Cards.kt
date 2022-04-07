@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.bankan.common.ui.components.DashOutline
 import com.example.bankan.common.ui.theme.BankanTheme
 
 @Preview
@@ -131,6 +133,24 @@ fun Card(name: String, description: String) {
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis
             ) {}
+        }
+    }
+}
+
+@Composable
+fun AddNewCard(modifier: Modifier = Modifier, onAddNewCard: () -> Unit) {
+    BankanTheme {
+        Column(
+            modifier = modifier
+                .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
+                .width(250.dp)
+                .aspectRatio(1.6f)
+        ) {
+            DashOutline(modifier = Modifier.fillMaxSize(), cornersSize = RoundedCornerShape(20.dp).topStart) {
+                IconButton(onClick = onAddNewCard) {
+                    Icon(Icons.Outlined.Add, "Add new card button")
+                }
+            }
         }
     }
 }
