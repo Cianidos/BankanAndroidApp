@@ -22,4 +22,10 @@ interface BoardInfoDao {
 
     @Query("SELECT * FROM BoardInfo")
     fun getAll(): Flow<List<BoardInfo>>
+
+    @Query("SELECT * FROM BoardInfo WHERE localId = :boardId")
+    fun getOne(boardId: Int): Flow<BoardInfo>
+
+    @Query("SELECT * FROM BoardInfo LIMIT 1")
+    fun getOne(): Flow<BoardInfo>
 }

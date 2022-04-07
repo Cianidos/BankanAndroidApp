@@ -9,6 +9,14 @@ class FakeBoardInfoRepository : BoardInfoRepository {
         listOf(BoardInfo(name = "One"), BoardInfo(name = "Two"))
     )
 
+    override fun getOne(): Flow<BoardInfo> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getOne(boardId: Int): Flow<BoardInfo> {
+        TODO("Not yet implemented")
+    }
+
     override fun getAll(): Flow<List<BoardInfo>> {
         return list
     }

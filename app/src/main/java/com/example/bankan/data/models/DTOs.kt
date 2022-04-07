@@ -14,7 +14,7 @@ data class BoardInfo(
     val isOpen: Boolean = false,
     val creationDate: Date = Date.from(Instant.EPOCH),
     val id: Int? = null,
-    @PrimaryKey(autoGenerate = true) val localId: Int? = null,
+    @PrimaryKey(autoGenerate = true) val localId: Int = 0,
 )
 
 data class ListData(val info: ListInfo, val content: List<CardInfo>)
@@ -26,7 +26,7 @@ data class ListInfo(
 
     val boardId: Int = -1,
     val id: Int? = null,
-    @PrimaryKey(autoGenerate = true) val localId: Int? = null,
+    @PrimaryKey(autoGenerate = true) val localId: Int = 0,
 )
 
 @Entity
@@ -36,5 +36,5 @@ data class CardInfo(
 
     val listId: Int = -1,
     val id: Int? = null,
-    @PrimaryKey(autoGenerate = true) val localId: Int? = null,
+    @PrimaryKey(autoGenerate = true) val localId: Int = 0,
 )

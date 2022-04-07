@@ -5,6 +5,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.example.bankan.data.models.BoardInfo
+import com.example.bankan.data.models.CardInfo
+import com.example.bankan.data.models.ListInfo
 import java.util.*
 
 object Converters {
@@ -20,7 +22,7 @@ object Converters {
 }
 
 
-@Database(entities = [BoardInfo::class], version = 1)
+@Database(entities = [BoardInfo::class, ListInfo::class, CardInfo::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDataBase : RoomDatabase() {
     abstract fun boardInfoDao(): BoardInfoDao

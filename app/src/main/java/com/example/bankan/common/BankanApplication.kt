@@ -2,8 +2,7 @@ package com.example.bankan.common
 
 import android.app.Application
 import com.example.bankan.data.dataModule
-import com.example.bankan.screens.autheneication.authenticationModule
-import com.example.bankan.screens.main.mainMenuModule
+import com.example.bankan.screens.screensModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -17,7 +16,7 @@ class BankanApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@BankanApplication)
-            modules(authenticationModule, mainMenuModule, dataModule,
+            modules(screensModule, dataModule,
                 module {
                     viewModel { NavigationViewModel() }
                 })

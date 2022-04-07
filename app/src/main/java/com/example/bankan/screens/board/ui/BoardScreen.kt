@@ -5,11 +5,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.*
+import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
+import org.koin.androidx.compose.viewModel
 
 @Preview
 @Composable
@@ -36,6 +40,14 @@ fun BoardScreenContentPreview(modifier: Modifier = Modifier) {
     BoardScreenContent(
         data = bd
     )
+}
+
+@Composable
+fun BoardScreen(modifier: Modifier = Modifier, boardId: Int?) {
+    val vm: BoardScreenViewModel by viewModel()
+    vm.setCurrentBoard(boardId!!)
+    val data by vm.data.collectAsState()
+    BoardScreenContent(modifier = modifier, data = data)
 }
 
 @OptIn(ExperimentalFoundationApi::class)

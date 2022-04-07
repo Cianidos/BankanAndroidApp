@@ -9,6 +9,14 @@ import org.koin.core.component.inject
 class LocalBoardInfoRepositoryImpl : BoardInfoRepository, KoinComponent {
     private val boardInfoDao: BoardInfoDao by inject()
 
+    override fun getOne(): Flow<BoardInfo> {
+        return boardInfoDao.getOne()
+    }
+
+    override fun getOne(boardId: Int): Flow<BoardInfo> {
+        return boardInfoDao.getOne(boardId = boardId)
+    }
+
     override fun getAll(): Flow<List<BoardInfo>> {
         return boardInfoDao.getAll()
     }

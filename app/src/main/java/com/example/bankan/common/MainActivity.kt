@@ -24,7 +24,7 @@ import com.example.bankan.common.BankanScreen.Authentication
 import com.example.bankan.common.BankanScreen.Main
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.autheneication.ui.Authentication
-import com.example.bankan.screens.board.ui.BoardScreenContentPreview
+import com.example.bankan.screens.board.ui.BoardScreen
 import com.example.bankan.screens.board.ui.CardExample
 import com.example.bankan.screens.board.ui.ListPreview
 import com.example.bankan.screens.main.ui.MainMenu
@@ -86,13 +86,12 @@ fun BankanApp() {
         val vm: NavigationViewModel by viewModel()
         val state: MainState by vm.state.collectAsState()
         val navController = rememberAnimatedNavController()
-        val currentScreen = when(state){
+        val currentScreen = when (state) {
             MainState.Authorized.Guest -> Main.BoardsList
             MainState.Authorized.LoggedIn -> Main.BoardsList
             MainState.Loading -> BankanScreen.Loading
             MainState.NotAuthorized -> Authentication
         }
-
         NavHostContainer(navController = navController, currentScreen = currentScreen)
     }
 }
@@ -111,7 +110,7 @@ fun NavHostContainer(
     ) {
         ContentWithBottomNavBarImpl(
             onBoardsListClicked = { navController.navigate(route = Main.BoardsList.name) },
-            onBoardClicked = { navController.navigate(route = Main.Board.name) },
+            onBoardClicked = { navController.navigate(route = Main.Board.name + "/0") },
             onSettingsClicked = { navController.navigate(route = Main.Settings.name) },
             centerContent = content
         )
@@ -126,83 +125,87 @@ fun NavHostContainer(
                 navController.navigate(route = Main.BoardsList.name)
             }
         }
-        composable(BankanScreen.Loading.name)  {
+
+        composable(BankanScreen.Loading.name) {
             BankanTheme {
                 CircularProgressIndicator()
             }
         }
 
         //navigation(Main.BoardsList.name, "Main") {
-            composable(
-                Main.BoardsList.name,
-                enterTransition = {
-                    slideIntoContainer(
-                        towards = AnimatedContentScope.SlideDirection.Right,
-                        animationSpec = tween(700)
-                    )
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentScope.SlideDirection.Left,
-                        animationSpec = tween(700)
-                    )
+        composable(
+            Main.BoardsList.name,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            }
+        ) {
+            ContentWithBottomNavBar {
+                MainMenu(it) { boardId -> navController.navigate(Main.Board.name + "/$boardId") }
+            }
+        }
+
+        composable(
+            Main.Board.name + "/{id}",
+            enterTransition = {
+                when (initialState.destination.route) {
+                    Main.BoardsList.name ->
+                        slideIntoContainer(
+                            towards = AnimatedContentScope.SlideDirection.Left,
+                            animationSpec = tween(700)
+                        )
+                    Main.Settings.name ->
+                        slideIntoContainer(
+                            towards = AnimatedContentScope.SlideDirection.Right,
+                            animationSpec = tween(700)
+                        )
+                    else -> null
                 }
-            ) {
-                ContentWithBottomNavBar {
-                    MainMenu(it) { }
+
+            },
+            exitTransition = {
+                when (targetState.destination.route) {
+                    Main.BoardsList.name ->
+                        slideOutOfContainer(
+                            towards = AnimatedContentScope.SlideDirection.Right,
+                            animationSpec = tween(700)
+                        )
+                    Main.Settings.name ->
+                        slideOutOfContainer(
+                            towards = AnimatedContentScope.SlideDirection.Left,
+                            animationSpec = tween(700)
+                        )
+                    else -> null
                 }
             }
+        ) { navBackStackEntry ->
+            val boardId = navBackStackEntry.arguments?.getString("id")?.toInt()
+            ContentWithBottomNavBar { BoardScreen(it, boardId) }
+        }
 
-            composable(
-                Main.Board.name,
-                enterTransition = {
-                    when (initialState.destination.route) {
-                        Main.BoardsList.name ->
-                            slideIntoContainer(
-                                towards = AnimatedContentScope.SlideDirection.Left,
-                                animationSpec = tween(700)
-                            )
-                        Main.Settings.name ->
-                            slideIntoContainer(
-                                towards = AnimatedContentScope.SlideDirection.Right,
-                                animationSpec = tween(700)
-                            )
-                        else -> null
-                    }
-
-                },
-                exitTransition = {
-                    when (targetState.destination.route) {
-                        Main.BoardsList.name ->
-                            slideOutOfContainer(
-                                towards = AnimatedContentScope.SlideDirection.Right,
-                                animationSpec = tween(700)
-                            )
-                        Main.Settings.name ->
-                            slideOutOfContainer(
-                                towards = AnimatedContentScope.SlideDirection.Left,
-                                animationSpec = tween(700)
-                            )
-                        else -> null
-                    }
-                }
-            ) { ContentWithBottomNavBar { BoardScreenContentPreview(it) } }
-
-            composable(
-                Main.Settings.name,
-                enterTransition = {
-                    slideIntoContainer(
-                        towards = AnimatedContentScope.SlideDirection.Left,
-                        animationSpec = tween(700)
-                    )
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentScope.SlideDirection.Right,
-                        animationSpec = tween(700)
-                    )
-                }
-            ) { ContentWithBottomNavBar { Screen(it) } }
+        composable(
+            Main.Settings.name,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            }
+        ) { ContentWithBottomNavBar { Screen(it) } }
         //}
     }
 }
