@@ -42,9 +42,9 @@ fun BoardScreenContentPreview(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun BoardScreen(modifier: Modifier = Modifier, boardId: Int?) {
+fun BoardScreen(modifier: Modifier = Modifier, boardId: Int) {
     val vm: BoardScreenViewModel by viewModel()
-    vm.setCurrentBoard(boardId!!)
+    vm.setCurrentBoard(boardId)
     val data by vm.data.collectAsState()
 
     BoardScreenContent(

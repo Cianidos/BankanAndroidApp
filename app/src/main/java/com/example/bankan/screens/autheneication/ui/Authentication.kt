@@ -23,18 +23,19 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bankan.R
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.autheneication.viewmodel.*
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.viewModel
 
 
-@Preview(showBackground = true)
 @Composable
-fun Authentication(modifier: Modifier = Modifier, onAppEnter: () -> Unit = {}) {
+@Destination(start = true)
+fun Authentication(modifier: Modifier = Modifier, navigator: DestinationsNavigator, onAppEnter: () -> Unit = {}) {
     val viewModel: AuthenticationViewModel by viewModel()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -43,7 +44,7 @@ fun Authentication(modifier: Modifier = Modifier, onAppEnter: () -> Unit = {}) {
             modifier = modifier.fillMaxWidth(),
             authenticationState = uiState,
             handleEvent = viewModel::handleEvent,
-            appEnter = onAppEnter
+            appEnter = { navigator.navigate("")}
         )
     }
 }

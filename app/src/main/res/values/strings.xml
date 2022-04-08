@@ -33,6 +33,9 @@
     <string name="cd_hide_password">Hide Password</string>
     <string name="continue_as_guest">Continue as Guest</string>
     <string name="label_nickname">Nickname</string>
+    <string name="list_of_boards">List of Boards</string>
+    <string name="board">Board</string>
+    <string name="settings">Settings</string>
 
 
 </resources>

@@ -1,9 +1,9 @@
 package com.example.bankan.screens.board.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -40,10 +40,10 @@ fun ListPreview() {
             CardInfo(name = "SomeName3", description = "Some Long Description")
         )
     )
-    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-        List1(data) {}
-        Spacer(modifier = Modifier.width(10.dp))
-        List2(data)
+    LazyRow(modifier = Modifier) {
+        item { List1(data) {} }
+        item { Spacer(modifier = Modifier.width(10.dp)) }
+        item { List2(data) }
     }
 }
 
@@ -104,7 +104,7 @@ fun AddNewList(modifier: Modifier = Modifier, onAddNewList: () -> Unit) {
 @Composable
 fun List2(data: ListData) {
     BankanTheme {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .wrapContentHeight()
                 .heightIn(max = LocalConfiguration.current.screenHeightDp.dp)
@@ -113,18 +113,22 @@ fun List2(data: ListData) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                text = data.info.name,
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier
-                    .background(Color.Gray, RoundedCornerShape(20.dp))
-            )
+            item {
+                Text(
+                    text = data.info.name,
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier
+                        .background(Color.Gray, RoundedCornerShape(20.dp))
+                )
+            }
             data.content.forEach { (name, description) ->
-                Spacer(modifier = Modifier.height(10.dp))
-                if (name.isNotEmpty())
-                    Card(name = name, description = description)
-                else
-                    NameLessCard(description)
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    if (name.isNotEmpty())
+                        Card(name = name, description = description)
+                    else
+                        NameLessCard(description)
+                }
             }
         }
     }

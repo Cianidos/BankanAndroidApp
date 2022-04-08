@@ -3,34 +3,42 @@ package com.example.bankan.common
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DeveloperBoard
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SpaceDashboard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
-import com.example.bankan.common.BankanScreen.Authentication
-import com.example.bankan.common.BankanScreen.Main
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.bankan.NavGraphs
 import com.example.bankan.common.ui.theme.BankanTheme
-import com.example.bankan.screens.autheneication.ui.Authentication
+import com.example.bankan.destinations.*
+import com.example.bankan.navDestination
 import com.example.bankan.screens.board.ui.BoardScreen
-import com.example.bankan.screens.board.ui.CardExample
-import com.example.bankan.screens.board.ui.ListPreview
 import com.example.bankan.screens.main.ui.MainMenu
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
+import com.example.bankan.screens.main.ui.MultitouchExamplesPreview
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.navigateTo
+import com.ramcosta.composedestinations.spec.DestinationStyle
+import com.ramcosta.composedestinations.spec.Direction
 import org.koin.androidx.compose.viewModel
 
 
@@ -54,161 +62,127 @@ class MainActivity : ComponentActivity() {
 // TODO choose dependencies strategy hoisting vs inject viewModel everywhere
 
 
-@Composable
-fun ContentWithBottomNavBarImpl(
-    modifier: Modifier = Modifier,
-    onBoardsListClicked: () -> Unit,
-    onBoardClicked: () -> Unit,
-    onSettingsClicked: () -> Unit,
-    centerContent: @Composable (modifier: Modifier) -> Unit
-) {
-    Scaffold(modifier = modifier,
-        bottomBar = {
-            BottomAppBar {
-                IconButton(modifier = Modifier.weight(1f), onClick = onBoardsListClicked) {
-                    Icon(Icons.Outlined.SpaceDashboard, contentDescription = "List of Boards")
-                }
-                IconButton(modifier = Modifier.weight(1f), onClick = onBoardClicked) {
-                    Icon(Icons.Outlined.DeveloperBoard, contentDescription = "Board")
-                }
-                IconButton(modifier = Modifier.weight(1f), onClick = onSettingsClicked) {
-                    Icon(Icons.Outlined.Settings, contentDescription = "Settings")
-                }
-            }
-        }) { centerContent(modifier = Modifier.padding(it)) }
-}
-
-
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class,
+    com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi::class
+)
 @Composable
 fun BankanApp() {
     BankanTheme {
         val vm: NavigationViewModel by viewModel()
         val state: MainState by vm.state.collectAsState()
         val navController = rememberAnimatedNavController()
+        val engine = rememberAnimatedNavHostEngine()
         val currentScreen = when (state) {
-            MainState.Authorized.Guest -> Main.BoardsList
-            MainState.Authorized.LoggedIn -> Main.BoardsList
-            MainState.Loading -> BankanScreen.Loading
-            MainState.NotAuthorized -> Authentication
+            MainState.Authorized.Guest -> BoardListScreenWithNavBarDestination
+            MainState.Authorized.LoggedIn -> BoardListScreenWithNavBarDestination
+            MainState.Loading -> LoadingScreenDestination
+            MainState.NotAuthorized -> AuthenticationDestination
         }
-        NavHostContainer(navController = navController, currentScreen = currentScreen)
+        DestinationsNavHost(
+            navGraph = NavGraphs.root,
+            startRoute = currentScreen,
+            navController = navController,
+            engine = engine
+        )
+    }
+}
+
+@Destination
+@Composable
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    BankanTheme {
+        CircularProgressIndicator()
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun NavHostContainer(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    currentScreen: BankanScreen,
-) {
-    @Composable
-    fun ContentWithBottomNavBar(
-        modifier: Modifier = Modifier,
-        content: @Composable (Modifier) -> Unit
-    ) {
-        ContentWithBottomNavBarImpl(
-            onBoardsListClicked = { navController.navigate(route = Main.BoardsList.name) },
-            onBoardClicked = { navController.navigate(route = Main.Board.name + "/0") },
-            onSettingsClicked = { navController.navigate(route = Main.Settings.name) },
-            centerContent = content
+object BoardListAnimationStyle : DestinationStyle.Animated {
+    override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition? =
+        slideIntoContainer(
+            towards = AnimatedContentScope.SlideDirection.Right,
+            animationSpec = tween(700)
         )
-    }
 
-    AnimatedNavHost(
-        navController = navController,
-        startDestination = currentScreen.name,
-    ) {
-        composable(Authentication.name) {
-            Authentication(modifier) {
-                navController.navigate(route = Main.BoardsList.name)
-            }
-        }
+    override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition? =
+        slideOutOfContainer(
+            towards = AnimatedContentScope.SlideDirection.Left,
+            animationSpec = tween(700)
+        )
+}
 
-        composable(BankanScreen.Loading.name) {
-            BankanTheme {
-                CircularProgressIndicator()
-            }
-        }
 
-        //navigation(Main.BoardsList.name, "Main") {
-        composable(
-            Main.BoardsList.name,
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentScope.SlideDirection.Right,
-                    animationSpec = tween(700)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentScope.SlideDirection.Left,
-                    animationSpec = tween(700)
-                )
-            }
-        ) {
-            ContentWithBottomNavBar {
-                MainMenu(it) { boardId -> navController.navigate(Main.Board.name + "/$boardId") }
-            }
-        }
-
-        composable(
-            Main.Board.name + "/{id}",
-            enterTransition = {
-                when (initialState.destination.route) {
-                    Main.BoardsList.name ->
-                        slideIntoContainer(
-                            towards = AnimatedContentScope.SlideDirection.Left,
-                            animationSpec = tween(700)
-                        )
-                    Main.Settings.name ->
-                        slideIntoContainer(
-                            towards = AnimatedContentScope.SlideDirection.Right,
-                            animationSpec = tween(700)
-                        )
-                    else -> null
-                }
-
-            },
-            exitTransition = {
-                when (targetState.destination.route) {
-                    Main.BoardsList.name ->
-                        slideOutOfContainer(
-                            towards = AnimatedContentScope.SlideDirection.Right,
-                            animationSpec = tween(700)
-                        )
-                    Main.Settings.name ->
-                        slideOutOfContainer(
-                            towards = AnimatedContentScope.SlideDirection.Left,
-                            animationSpec = tween(700)
-                        )
-                    else -> null
-                }
-            }
-        ) { navBackStackEntry ->
-            val boardId = navBackStackEntry.arguments?.getString("id")?.toInt()
-            ContentWithBottomNavBar { BoardScreen(it, boardId) }
-        }
-
-        composable(
-            Main.Settings.name,
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentScope.SlideDirection.Left,
-                    animationSpec = tween(700)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentScope.SlideDirection.Right,
-                    animationSpec = tween(700)
-                )
-            }
-        ) { ContentWithBottomNavBar { Screen(it) } }
-        //}
+@Destination(style = BoardListAnimationStyle::class)
+@Composable
+fun BoardListScreenWithNavBar(modifier: Modifier = Modifier, nav: NavController) {
+    ContentWithBottomNavBar(nav = nav) {
+        MainMenu(it) { boardId -> nav.navigateTo(BoardScreenWithNavBarDestination(boardId = boardId)) }
     }
 }
+
+@OptIn(ExperimentalAnimationApi::class)
+object BoardAnimationStyle : DestinationStyle.Animated {
+    override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition? =
+        when (initialState.navDestination) {
+            BoardListScreenWithNavBarDestination ->
+                slideIntoContainer(
+                    towards = AnimatedContentScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            SettingsScreenDestination ->
+                slideIntoContainer(
+                    towards = AnimatedContentScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            else -> null
+        }
+
+    override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition? =
+        when (targetState.navDestination) {
+            BoardListScreenWithNavBarDestination ->
+                slideOutOfContainer(
+                    towards = AnimatedContentScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            SettingsScreenDestination ->
+                slideOutOfContainer(
+                    towards = AnimatedContentScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            else -> null
+        }
+}
+
+@Destination(style = BoardAnimationStyle::class)
+@Composable
+fun BoardScreenWithNavBar(
+    modifier: Modifier = Modifier,
+    nav: NavController,
+    boardId: Int
+) {
+    ContentWithBottomNavBar(nav = nav) { BoardScreen(it, boardId) }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+object SettingsAnimationStyle : DestinationStyle.Animated {
+    override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition? =
+        slideIntoContainer(
+            towards = AnimatedContentScope.SlideDirection.Left,
+            animationSpec = tween(700)
+        )
+
+    override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition? =
+        slideOutOfContainer(
+            towards = AnimatedContentScope.SlideDirection.Right,
+            animationSpec = tween(700)
+        )
+}
+
+@Destination(style = SettingsAnimationStyle::class)
+@Composable
+fun SettingsScreen(modifier: Modifier = Modifier, nav: NavController) {
+    ContentWithBottomNavBar(nav = nav) { Screen(it) }
+}
+
 
 
 @Preview
@@ -220,10 +194,64 @@ private fun Screen(modifier: Modifier = Modifier) {
             modifier = modifier.fillMaxSize(),
             color = MaterialTheme.colors.background
         ) {
-            Column {
-                CardExample()
-                ListPreview()
-            }
+            MultitouchExamplesPreview()
+        }
+    }
+}
+
+@Composable
+fun ContentWithBottomNavBar(
+    modifier: Modifier = Modifier,
+    nav: NavController,
+    content: @Composable (modifier: Modifier) -> Unit,
+) {
+    Scaffold(modifier = modifier,
+        bottomBar = { BottomBar(navController = nav) }) {
+        content(modifier = Modifier.padding(it))
+    }
+}
+
+enum class BottomBarDestination(
+    val direction: Direction,
+    val icon: ImageVector,
+    @StringRes val label: Int
+) {
+    BoardList(
+        BoardListScreenWithNavBarDestination,
+        Icons.Outlined.SpaceDashboard,
+        com.example.bankan.R.string.list_of_boards
+    ),
+    Board(
+        BoardScreenWithNavBarDestination(0),
+        Icons.Outlined.SpaceDashboard,
+        com.example.bankan.R.string.board
+    ),
+
+    Settings(
+        SettingsScreenDestination,
+        Icons.Outlined.Settings,
+        com.example.bankan.R.string.settings
+    ),
+}
+
+@Composable
+fun BottomBar(
+    navController: NavController
+) {
+    val currentDestination = navController.currentBackStackEntryAsState().value?.navDestination
+
+    BottomNavigation {
+        BottomBarDestination.values().forEach { destination ->
+            val stringRes = stringResource(id = destination.label)
+            BottomNavigationItem(
+                selected = currentDestination == destination.direction,
+                onClick = {
+                    navController.navigateTo(destination.direction) { launchSingleTop = true }
+                    //Log.d("AAAAAAAAA", "${currentDestination}, ${destination.direction} \n ${currentDestination?.route} ${destination.direction.route}")
+                },
+                icon = { Icon(destination.icon, contentDescription = stringRes) },
+                label = { Text(stringRes) },
+            )
         }
     }
 }
