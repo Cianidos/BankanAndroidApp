@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.bankan.NavGraphs
 import com.example.bankan.common.ui.theme.BankanTheme
+import com.example.bankan.data.repository.ProfileRepository
 import com.example.bankan.destinations.*
 import com.example.bankan.navDestination
 import com.example.bankan.screens.board.ui.BoardScreen
@@ -39,6 +40,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigateTo
 import com.ramcosta.composedestinations.spec.DestinationStyle
 import com.ramcosta.composedestinations.spec.Direction
+import org.koin.androidx.compose.inject
 import org.koin.androidx.compose.viewModel
 
 
@@ -114,8 +116,9 @@ object BoardListAnimationStyle : DestinationStyle.Animated {
 @Destination(style = BoardListAnimationStyle::class)
 @Composable
 fun BoardListScreenWithNavBar(modifier: Modifier = Modifier, nav: NavController) {
+    val profileRepository: ProfileRepository by inject()
     ContentWithBottomNavBar(nav = nav) {
-        MainMenu(it) { boardId -> nav.navigateTo(BoardScreenWithNavBarDestination(boardId = boardId)) }
+        MainMenu(it) { boardId -> nav.navigateTo(BoardScreenWithNavBarDestination) }
     }
 }
 
@@ -157,9 +160,8 @@ object BoardAnimationStyle : DestinationStyle.Animated {
 fun BoardScreenWithNavBar(
     modifier: Modifier = Modifier,
     nav: NavController,
-    boardId: Int
 ) {
-    ContentWithBottomNavBar(nav = nav) { BoardScreen(it, boardId) }
+    ContentWithBottomNavBar(nav = nav) { BoardScreen(it) }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -222,7 +224,7 @@ enum class BottomBarDestination(
         com.example.bankan.R.string.list_of_boards
     ),
     Board(
-        BoardScreenWithNavBarDestination(0),
+        BoardScreenWithNavBarDestination,
         Icons.Outlined.SpaceDashboard,
         com.example.bankan.R.string.board
     ),

@@ -7,6 +7,7 @@ import com.example.bankan.data.models.*
 import com.example.bankan.data.repository.BoardInfoRepository
 import com.example.bankan.data.repository.CardInfoRepository
 import com.example.bankan.data.repository.ListInfoRepository
+import com.example.bankan.data.repository.ProfileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,13 +25,13 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
     private val boardRepository: BoardInfoRepository by inject()
     private val listRepository: ListInfoRepository by inject()
     private val cardRepository: CardInfoRepository by inject()
+    private val profileRepository: ProfileRepository by inject()
 
     private val _data: MutableStateFlow<BoardData> =
         MutableStateFlow(BoardData(BoardInfo(""), listOf()))
 
     val data = _data.asStateFlow()
-
-    private val _boardId = MutableStateFlow(1)
+    private val _boardId =profileRepository.currentBoardId
 
     //    init {
 //        viewModelScope.launch(Dispatchers.IO) {
@@ -55,31 +56,26 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
 //    }
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            boardRepository.getOne().collect {
-                _boardId.value = it.localId
+            _boardId.collect { id ->
                 launch {
-                    _boardId.collect { id ->
+                    boardRepository.getOne(boardId = id!!).collect { boardInfo ->
                         launch {
-                            boardRepository.getOne(boardId = id).collect { boardInfo ->
-                                launch {
-                                    listRepository.getAll(boardId = boardInfo.localId)
-                                        .collect { listInfoList ->
-                                            val lists = mutableListOf<ListData>()
-                                            listInfoList.forEach { listInfo ->
-                                                launch {
-                                                    cardRepository.getAll(listId = listInfo.localId)
-                                                        .collect { cardInfoList ->
-                                                            lists += ListData(
-                                                                listInfo,
-                                                                cardInfoList
-                                                            )
-                                                        }
+                            listRepository.getAll(boardId = boardInfo.localId)
+                                .collect { listInfoList ->
+                                    val lists = mutableListOf<ListData>()
+                                    listInfoList.forEach { listInfo ->
+                                        launch {
+                                            cardRepository.getAll(listId = listInfo.localId)
+                                                .collect { cardInfoList ->
+                                                    lists += ListData(
+                                                        listInfo,
+                                                        cardInfoList
+                                                    )
                                                 }
-                                                _data.value = BoardData(boardInfo, lists)
-                                            }
                                         }
+                                        _data.value = BoardData(boardInfo, lists)
+                                    }
                                 }
-                            }
                         }
                     }
                 }
@@ -87,15 +83,16 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun setCurrentBoard(boardId: Int) {
-        if (boardId > 0)
-            _boardId.value = boardId
-    }
-
     fun addNewList() {
         viewModelScope.launch(Dispatchers.IO) {
-            listRepository.add(ListInfo("hhaa", boardId = _boardId.value))
-            Log.d("AAAAAAAAAAAAAA", "ADD LIST")
+            launch {
+                _boardId.collect {
+                    launch {
+                        listRepository.add(ListInfo("hhaa", boardId = it!!))
+                        Log.d("AAAAAAAAAAAAAA", "ADD LIST")
+                    }
+                }
+            }
         }
     }
 

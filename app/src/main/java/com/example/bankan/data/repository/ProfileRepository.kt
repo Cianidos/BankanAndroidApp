@@ -16,10 +16,12 @@ interface ProfileRepository {
     val userId: Flow<Int>
     val userName: Flow<String>
     val sessionToken: String
+    val currentBoardId: Flow<Int?>
 
     suspend fun setUserName(name: String)
     fun authorize(login: String, password: String)
     suspend fun continueAsGuest(userName: String)
+    suspend fun setNewCurrentBoardId(localId: Int)
 }
 
 object PreferencesKeys {
@@ -27,6 +29,7 @@ object PreferencesKeys {
     val isGuest = booleanPreferencesKey("AUTHORIZED")
     val userId = intPreferencesKey("USER_ID")
     val username = stringPreferencesKey("USERNAME")
+    val boardId = intPreferencesKey("CURRENT_BOARD_ID")
 }
 
 
@@ -39,7 +42,7 @@ class ProfileRepositoryInDataStoreNoInternetImpl : ProfileRepository, KoinCompon
             it[PreferencesKeys.isAuthorized] ?: false
         }
     override val isGuest: Flow<Boolean>
-        get() = preferences.data.map {   it[PreferencesKeys.isGuest] ?: false }
+        get() = preferences.data.map { it[PreferencesKeys.isGuest] ?: false }
 
     override val userId: Flow<Int>
         get() = preferences.data.map {
@@ -60,6 +63,11 @@ class ProfileRepositoryInDataStoreNoInternetImpl : ProfileRepository, KoinCompon
     override val sessionToken: String
         get() = TODO("Not yet implemented")
 
+    override val currentBoardId: Flow<Int?>
+        get() = preferences.data.map {
+            it[PreferencesKeys.boardId]
+        }
+
     override fun authorize(login: String, password: String) {
         TODO("Not yet implemented")
     }
@@ -69,6 +77,12 @@ class ProfileRepositoryInDataStoreNoInternetImpl : ProfileRepository, KoinCompon
             it[PreferencesKeys.isGuest] = true
             it[PreferencesKeys.isAuthorized] = true
             it[PreferencesKeys.username] = userName
+        }
+    }
+
+    override suspend fun setNewCurrentBoardId(localId: Int) {
+        preferences.edit {
+            it[PreferencesKeys.boardId] = localId
         }
     }
 }

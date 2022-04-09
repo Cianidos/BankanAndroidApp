@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.repository.BoardInfoRepository
+import com.example.bankan.data.repository.ProfileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,7 @@ enum class MainMenuUiStates {
 class MainMenuViewModel : ViewModel(), KoinComponent {
 
     private val boardInfoRepository: BoardInfoRepository by inject()
+    private val profileRepository: ProfileRepository by inject()
 
     private val _uiModel = MutableStateFlow(
         MainMenuUiModel(
@@ -49,6 +51,12 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
         _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.EnteringName)
     }
 
+    fun chooseCurrentBoard(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            profileRepository.setNewCurrentBoardId(id)
+        }
+    }
+
     fun changeNewBoardName(updatedName: String) {
         _uiModel.value = _uiModel.value.copy(newBoardName = updatedName)
     }
@@ -65,9 +73,9 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
         _uiModel.value = _uiModel.value.copy(newBoardName = "", state = MainMenuUiStates.View)
     }
 
-    fun deleteBoard(index: Int) {
+    fun deleteBoard(localId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            boardInfoRepository.delete(index)
+            boardInfoRepository.delete(localId)
         }
     }
 }

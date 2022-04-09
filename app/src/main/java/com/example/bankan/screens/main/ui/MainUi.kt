@@ -39,7 +39,7 @@ fun MainMenu(modifier: Modifier = Modifier, onBoardChosen: (boardId: Int) -> Uni
     val vm: MainMenuViewModel by viewModel()
     val uiModel by vm.uiModel.collectAsState()
     MainMenuContent(
-        onBoardChosen = onBoardChosen,
+        onBoardChosen = { vm.chooseCurrentBoard(it); onBoardChosen(it)},
         uiModel = uiModel,
         onCreateNewBoard = { vm.createNewBoard() },
         onChangeNewBoardName = { vm.changeNewBoardName(it) },
@@ -88,8 +88,8 @@ fun BoardList(
         eachAndBetween(data = uiModel.boardInfoList.withIndex().toList()) {
             BoardCard(
                 boardInfo = it.value,
-                onBoardChosen = { onBoardChosen(it.index) },
-                onDelete = { vm.deleteBoard(it.index) })
+                onBoardChosen = { onBoardChosen(it.value.localId) },
+                onDelete = { vm.deleteBoard(it.value.localId) })
         }
         item {
             Spacer(
