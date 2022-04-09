@@ -1,5 +1,6 @@
 package com.example.bankan.screens.board.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bankan.data.models.*
@@ -31,7 +32,7 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
 
     private val _boardId = MutableStateFlow(1)
 
-//    init {
+    //    init {
 //        viewModelScope.launch(Dispatchers.IO) {
 //            boardRepository.getOne().collect {
 //                _boardId.value = it.localId
@@ -56,18 +57,30 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch(Dispatchers.IO) {
             boardRepository.getOne().collect {
                 _boardId.value = it.localId
-            }
-            _boardId.collect { id ->
-                boardRepository.getOne(boardId = id).collect { boardInfo ->
-                    listRepository.getAll(boardId = boardInfo.localId).collect { listInfoList ->
-                        val lists = mutableListOf<ListData>()
-                        listInfoList.forEach { listInfo ->
-                            cardRepository.getAll(listId = listInfo.localId)
-                                .collect { cardInfoList ->
-                                    lists += ListData(listInfo, cardInfoList)
+                launch {
+                    _boardId.collect { id ->
+                        launch {
+                            boardRepository.getOne(boardId = id).collect { boardInfo ->
+                                launch {
+                                    listRepository.getAll(boardId = boardInfo.localId)
+                                        .collect { listInfoList ->
+                                            val lists = mutableListOf<ListData>()
+                                            listInfoList.forEach { listInfo ->
+                                                launch {
+                                                    cardRepository.getAll(listId = listInfo.localId)
+                                                        .collect { cardInfoList ->
+                                                            lists += ListData(
+                                                                listInfo,
+                                                                cardInfoList
+                                                            )
+                                                        }
+                                                }
+                                                _data.value = BoardData(boardInfo, lists)
+                                            }
+                                        }
                                 }
+                            }
                         }
-                        _data.value = BoardData(boardInfo, lists)
                     }
                 }
             }
@@ -82,12 +95,14 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
     fun addNewList() {
         viewModelScope.launch(Dispatchers.IO) {
             listRepository.add(ListInfo("hhaa", boardId = _boardId.value))
+            Log.d("AAAAAAAAAAAAAA", "ADD LIST")
         }
     }
 
     fun addNewCard(listId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             cardRepository.add(CardInfo("hhaa", listId = listId))
+            Log.d("AAAAAAAAAAAAAA", "ADD CARD")
         }
     }
 }

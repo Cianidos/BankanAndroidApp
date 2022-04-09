@@ -92,6 +92,7 @@ fun Card(name: String, description: String) {
                 .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
                 .width(250.dp)
                 .aspectRatio(1.6f)
+                .sizeIn(maxHeight = (250 * 1.6f).dp, maxWidth = 250.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -140,7 +141,7 @@ fun Card(name: String, description: String) {
 @Composable
 fun AddNewCard(modifier: Modifier = Modifier, onAddNewCard: () -> Unit) {
     BankanTheme {
-        Column(
+        Surface(
             modifier = modifier
                 .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
                 .width(250.dp)

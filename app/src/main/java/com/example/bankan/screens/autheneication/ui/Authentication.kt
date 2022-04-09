@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bankan.R
 import com.example.bankan.common.ui.theme.BankanTheme
+import com.example.bankan.destinations.BoardListScreenWithNavBarDestination
 import com.example.bankan.screens.autheneication.viewmodel.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -44,7 +45,7 @@ fun Authentication(modifier: Modifier = Modifier, navigator: DestinationsNavigat
             modifier = modifier.fillMaxWidth(),
             authenticationState = uiState,
             handleEvent = viewModel::handleEvent,
-            appEnter = { navigator.navigate("")}
+            appEnter = { navigator.navigate(BoardListScreenWithNavBarDestination)}
         )
     }
 }

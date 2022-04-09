@@ -4,13 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.Composable
@@ -54,8 +49,7 @@ fun List1(data: ListData, onAddNewCard: (Int) -> Unit) {
             modifier = Modifier
                 .background(Color.DarkGray, RoundedCornerShape(20.dp))
                 .width(280.dp)
-                .heightIn(max = LocalConfiguration.current.screenHeightDp.dp)
-                .verticalScroll(rememberScrollState()),
+                .heightIn(max = LocalConfiguration.current.screenHeightDp.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             //verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -87,7 +81,7 @@ fun List1(data: ListData, onAddNewCard: (Int) -> Unit) {
 @Composable
 fun AddNewList(modifier: Modifier = Modifier, onAddNewList: () -> Unit) {
     BankanTheme {
-        Column(
+        Surface(
             modifier = modifier
                 .background(Color.DarkGray, RoundedCornerShape(20.dp))
                 .width(280.dp)
@@ -108,8 +102,7 @@ fun List2(data: ListData) {
             modifier = Modifier
                 .wrapContentHeight()
                 .heightIn(max = LocalConfiguration.current.screenHeightDp.dp)
-                .background(Color.DarkGray, RoundedCornerShape(20.dp))
-                .verticalScroll(rememberScrollState()),
+                .background(Color.DarkGray, RoundedCornerShape(20.dp)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
