@@ -1,6 +1,7 @@
 package com.example.bankan.screens.main.ui
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -39,7 +40,7 @@ fun MainMenu(modifier: Modifier = Modifier, onBoardChosen: (boardId: Int) -> Uni
     val vm: MainMenuViewModel by viewModel()
     val uiModel by vm.uiModel.collectAsState()
     MainMenuContent(
-        onBoardChosen = { vm.chooseCurrentBoard(it); onBoardChosen(it)},
+        onBoardChosen = { vm.chooseCurrentBoard(it); onBoardChosen(it) },
         uiModel = uiModel,
         onCreateNewBoard = { vm.createNewBoard() },
         onChangeNewBoardName = { vm.changeNewBoardName(it) },
@@ -149,7 +150,7 @@ fun BoardCard(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun CreateNewBoard(
     modifier: Modifier = Modifier,
@@ -161,25 +162,30 @@ fun CreateNewBoard(
     val tfFr = remember { FocusRequester() }
 
     DashOutline(modifier = modifier) {
-        Column {
-            AnimatedVisibility(visible = uiModel.state == MainMenuUiStates.View) {
-                IconButton(onClick = { onCreateNewBoard() }) {
-                    Icon(Icons.Outlined.Add, contentDescription = "Create New Board")
+        AnimatedContent(targetState = uiModel.state, transitionSpec = {
+            fadeIn(tween(500)) with fadeOut(tween(500))
+        }) { targetState ->
+            when (targetState) {
+                MainMenuUiStates.View -> {
+                    IconButton(onClick = { onCreateNewBoard() }) {
+                        Icon(Icons.Outlined.Add, contentDescription = "Create New Board")
+                    }
                 }
-            }
-            AnimatedVisibility(visible = uiModel.state == MainMenuUiStates.EnteringName) {
-                TextField(
-                    modifier = Modifier
-                        .focusRequester(tfFr)
-                        .onPlaced { tfFr.requestFocus() },
-                    value = uiModel.newBoardName,
-                    onValueChange = { onChangeNewBoardName(it) },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(onDone = { onSubmitNewBoard() })
-                )
+                MainMenuUiStates.EnteringName -> {
+                    TextField(
+                        modifier = Modifier
+                            .focusRequester(tfFr)
+                            .onPlaced { tfFr.requestFocus() },
+                        value = uiModel.newBoardName,
+                        onValueChange = { onChangeNewBoardName(it) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(onDone = { onSubmitNewBoard() })
+                    )
+                }
+                else -> {}
             }
         }
     }

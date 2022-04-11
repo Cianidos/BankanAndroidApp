@@ -52,14 +52,16 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun createNewBoard() {
-        _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.EnteringName)
-    }
 
     fun chooseCurrentBoard(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             profileRepository.setNewCurrentBoardId(id)
         }
+    }
+
+
+    fun createNewBoard() {
+        _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.EnteringName)
     }
 
     fun changeNewBoardName(updatedName: String) {
@@ -77,6 +79,8 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
     fun discardNewBoard() {
         _uiModel.value = _uiModel.value.copy(newBoardName = "", state = MainMenuUiStates.View)
     }
+
+
 
     fun deleteBoard(localId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
