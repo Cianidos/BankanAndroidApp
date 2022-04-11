@@ -1,31 +1,22 @@
 package com.example.bankan.screens.main.ui
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onPlaced
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.example.bankan.common.ui.components.DashOutline
+import com.example.bankan.common.ui.components.CreateNewButton
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardInfo
@@ -61,7 +52,11 @@ fun MainMenuContent(
     BankanTheme {
         Column(modifier = modifier
             .fillMaxSize()
-            .clickable { vm.discardNewBoard() }) {
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { vm.discardNewBoard() })
+        {
             BoardList(
                 modifier = modifier,
                 uiModel = uiModel,
@@ -159,34 +154,13 @@ fun CreateNewBoard(
     onChangeNewBoardName: (String) -> Unit,
     onSubmitNewBoard: () -> Unit
 ) {
-    val tfFr = remember { FocusRequester() }
-
-    DashOutline(modifier = modifier) {
-        AnimatedContent(targetState = uiModel.state, transitionSpec = {
-            fadeIn(tween(500)) with fadeOut(tween(500))
-        }) { targetState ->
-            when (targetState) {
-                MainMenuUiStates.View -> {
-                    IconButton(onClick = { onCreateNewBoard() }) {
-                        Icon(Icons.Outlined.Add, contentDescription = "Create New Board")
-                    }
-                }
-                MainMenuUiStates.EnteringName -> {
-                    TextField(
-                        modifier = Modifier
-                            .focusRequester(tfFr)
-                            .onPlaced { tfFr.requestFocus() },
-                        value = uiModel.newBoardName,
-                        onValueChange = { onChangeNewBoardName(it) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(onDone = { onSubmitNewBoard() })
-                    )
-                }
-                else -> {}
-            }
-        }
-    }
+    CreateNewButton(
+        modifier = modifier,
+        isEntering = uiModel.state == MainMenuUiStates.EnteringName,
+        name = uiModel.newBoardName,
+        onCreateNew = onCreateNewBoard,
+        onNameChanged = onChangeNewBoardName,
+        onSubmit = onSubmitNewBoard
+    )
 }
+
