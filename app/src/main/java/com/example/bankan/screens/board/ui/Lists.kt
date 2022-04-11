@@ -4,21 +4,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.example.bankan.common.ui.components.DashOutline
+import com.example.bankan.common.ui.components.CreateNewButton
 import com.example.bankan.common.ui.theme.BankanTheme
+import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.models.ListData
+import com.example.bankan.data.models.ListInfo
+import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
+import org.koin.androidx.compose.viewModel
 
 @Composable
-fun List1(data: ListData, onAddNewCard: (Int) -> Unit) {
+fun List1(data: ListData) {
     BankanTheme {
         LazyColumn(
             modifier = Modifier
@@ -46,26 +51,32 @@ fun List1(data: ListData, onAddNewCard: (Int) -> Unit) {
                 }
             }
             item {
-                AddNewCard(onAddNewCard = { onAddNewCard(data.info.localId) })
+                AddNewCard(listInfo = data.info)
             }
         }
     }
 }
 
 @Composable
-fun AddNewList(modifier: Modifier = Modifier, onAddNewList: () -> Unit) {
+fun AddNewList(modifier: Modifier = Modifier) {
+    val vm: BoardScreenViewModel by viewModel()
+    val boardInfo by vm.boardInfo().collectAsState(initial = BoardInfo(""))
+    val isEntering by vm.isEnteringNewListName.collectAsState()
+    val newListName by vm.newListName.collectAsState()
+
     BankanTheme {
-        Surface(
-            modifier = modifier
-                .background(Color.DarkGray, RoundedCornerShape(20.dp))
-                .width(280.dp)
-        ) {
-            DashOutline(Modifier.fillMaxSize(), cornersSize = RoundedCornerShape(20.dp).topStart) {
-                IconButton(onClick = onAddNewList) {
-                    Icon(Icons.Outlined.Add, "Add new list button")
-                }
+        CreateNewButton(
+            isEntering = isEntering,
+            name = newListName,
+            onCreateNew = { vm.isEnteringNewListName.value = true },
+            onNameChanged = { vm.newListName.value = it },
+            onSubmit = {
+                vm.addNewList(
+                    ListInfo( name = newListName, boardId = boardInfo.localId ) )
+                vm.newListName.value = ""
+                vm.isEnteringNewListName.value = false
             }
-        }
+        )
     }
 }
 

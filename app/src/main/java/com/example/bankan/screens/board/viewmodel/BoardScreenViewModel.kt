@@ -1,6 +1,5 @@
 package com.example.bankan.screens.board.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bankan.data.models.BoardInfo
@@ -13,6 +12,7 @@ import com.example.bankan.data.repository.ProfileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -32,28 +32,29 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
 
     private val _boardId =
         profileRepository.currentBoardId//.shareIn(viewModelScope, SharingStarted.Eagerly)
-    private var listCounter = 0
-    private var cardCounter = 0
+
+
+    var newListName: MutableStateFlow<String> = MutableStateFlow("")
+    var isEnteringNewListName: MutableStateFlow<Boolean> = MutableStateFlow(false )
+
+    var newCardName: MutableStateFlow<String> = MutableStateFlow("")
+    val isEnteringNewCardName: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     fun boardInfo(): Flow<BoardInfo> = _boardId.flatMapConcat { boardRepository.getOne(it!!) }
     fun listInfo(): Flow<List<ListInfo>> = _boardId.flatMapConcat { listRepository.getAll(it!!) }
     fun cardInfo(listId: Int): Flow<List<CardInfo>> = cardRepository.getAll(listId = listId)
     fun listData(): Flow<List<Pair<ListInfo, Flow<List<CardInfo>>>>> =
-        listInfo().map { it.map { it to cardRepository.getAll(it.localId) } }
+        listInfo().map { it.map { it to cardInfo(it.localId) } }
 
-    fun addNewList(boardId: Int) {
+    fun addNewList(listInfo: ListInfo) {
         viewModelScope.launch(Dispatchers.IO) {
-            listRepository.add(ListInfo("hhaa $listCounter", boardId = boardId))
-            Log.d("AAAAAAAAAAAAAA", "ADD LIST $listCounter")
+            listRepository.add(listInfo)
         }
-        listCounter++
     }
 
-    fun addNewCard(listId: Int) {
+    fun addNewCard(cardInfo: CardInfo) {
         viewModelScope.launch(Dispatchers.IO) {
-            cardRepository.add(CardInfo("hhaa $cardCounter", listId = listId))
-            Log.d("AAAAAAAAAAAAAA", "ADD CARD $cardCounter")
+            cardRepository.add(cardInfo)
         }
-        cardCounter++
     }
 }

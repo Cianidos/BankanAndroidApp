@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -31,9 +32,11 @@ fun CreateNewButton(
 ) {
     val tfFr = remember { FocusRequester() }
     DashOutline(modifier = modifier) {
-        AnimatedContent(targetState = isEntering, transitionSpec = {
-            fadeIn(tween(500)) with fadeOut(tween(500))
-        }) { targetState ->
+        AnimatedContent(
+            targetState = isEntering,
+            contentAlignment = Alignment.Center,
+            transitionSpec = { fadeIn(tween(500)) with fadeOut(tween(500)) })
+        { targetState ->
             if (targetState) TextField(
                 modifier = Modifier
                     .focusRequester(tfFr)
@@ -46,7 +49,7 @@ fun CreateNewButton(
                 ),
                 keyboardActions = KeyboardActions(onDone = { onSubmit() })
             )
-            else IconButton(onClick = { onCreateNew() }) {
+            else IconButton(modifier = Modifier, onClick = { onCreateNew() }) {
                 Icon(Icons.Outlined.Add, contentDescription = null)
             }
         }
