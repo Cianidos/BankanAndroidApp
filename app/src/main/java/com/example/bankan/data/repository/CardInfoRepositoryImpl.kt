@@ -26,4 +26,8 @@ class CardInfoRepositoryImpl : CardInfoRepository, KoinComponent {
         cardDao.delete(cardInfo)
     }
 
+    override suspend fun deleteByListId(listLocalId: Int) {
+        cardDao.deleteByListId(listLocalId)
+    }
+
 }

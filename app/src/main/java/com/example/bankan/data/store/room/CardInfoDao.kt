@@ -18,6 +18,9 @@ interface CardInfoDao {
     @Query("DELETE FROM CardInfo WHERE localId = :cardId")
     suspend fun deleteByLocalId(cardId: Int)
 
+    @Query("DELETE FROM CardInfo WHERE listId = :listLocalId")
+    fun deleteByListId(listLocalId: Int)
+
     @Query("SELECT * FROM CardInfo WHERE listId = :listId")
     fun getAll(listId: Int): Flow<List<CardInfo>>
 }

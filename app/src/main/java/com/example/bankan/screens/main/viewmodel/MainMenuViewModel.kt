@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.repository.BoardInfoRepository
+import com.example.bankan.data.repository.CardInfoRepository
+import com.example.bankan.data.repository.ListInfoRepository
 import com.example.bankan.data.repository.ProfileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +28,8 @@ enum class MainMenuUiStates {
 class MainMenuViewModel : ViewModel(), KoinComponent {
 
     private val boardInfoRepository: BoardInfoRepository by inject()
+    private val listInfoRepository: ListInfoRepository by inject()
+    private val cardInfoRepository: CardInfoRepository by inject()
     private val profileRepository: ProfileRepository by inject()
 
     private val _uiModel = MutableStateFlow(
@@ -42,7 +46,8 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch(Dispatchers.IO) {
             boardInfoRepository.getAll().distinctUntilChanged().collect {
                 _uiModel.value = _uiModel.value.copy(state = MainMenuUiStates.Loading)
-                _uiModel.value = _uiModel.value.copy(boardInfoList = it, state = MainMenuUiStates.View)
+                _uiModel.value =
+                    _uiModel.value.copy(boardInfoList = it, state = MainMenuUiStates.View)
             }
         }
     }
@@ -75,7 +80,19 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
 
     fun deleteBoard(localId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            boardInfoRepository.delete(localId)
+            launch {
+                listInfoRepository.getAll(localId).collect {
+                    it.forEach {
+                        launch {
+                            cardInfoRepository.deleteByListId(it.localId)
+                        }
+                        listInfoRepository.delete(it.localId)
+                    }
+                }
+            }
+            launch {
+                boardInfoRepository.delete(localId = localId)
+            }
         }
     }
 }

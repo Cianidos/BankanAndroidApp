@@ -126,7 +126,7 @@ fun BoardCard(
         } else true
     }
 
-    val anchors = mapOf(0f to 0, contentSize.width to 1) // Maps anchor points (in px) to states
+    val anchors = mapOf(0f to 0, contentSize.width to 1)
 
     Box(
         modifier = modifier

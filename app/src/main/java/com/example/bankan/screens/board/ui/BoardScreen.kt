@@ -41,15 +41,28 @@ fun BoardScreenContentPreview(modifier: Modifier = Modifier) {
         data = bd, onAddNewCard = {}, onAddNewList = {})
 }
 
+// deleting uses indexes instead of local id
+// storage with current board dont know anything about changes in board set
+
+
 @Composable
 fun BoardScreen(modifier: Modifier = Modifier) {
     val vm: BoardScreenViewModel by viewModel()
-    val data by vm.data.collectAsState()
+    val boardInfo by vm.boardInfo().collectAsState(initial = BoardInfo(""))
+    val listInfo by vm.listData().collectAsState(initial = emptyList())
+
+
+    val cardInfo: List<ListData> = listInfo.map {
+        val cardList by it.second.collectAsState(initial = emptyList())
+        ListData(it.first, cardList)
+    }
+
+    val data = BoardData(boardInfo, cardInfo)
 
     BoardScreenContent(
         modifier = modifier,
         data = data,
-        onAddNewList = { vm.addNewList() },
+        onAddNewList = { vm.addNewList(it) },
         onAddNewCard = { vm.addNewCard(it) })
 }
 
@@ -58,7 +71,7 @@ fun BoardScreen(modifier: Modifier = Modifier) {
 fun BoardScreenContent(
     modifier: Modifier = Modifier,
     data: BoardData,
-    onAddNewList: () -> Unit,
+    onAddNewList: (Int) -> Unit,
     onAddNewCard: (Int) -> Unit
 ) {
     BankanTheme {
@@ -74,7 +87,7 @@ fun BoardScreenContent(
                         List1(data = it, onAddNewCard = onAddNewCard)
                     }
                     item {
-                        AddNewList(onAddNewList = onAddNewList)
+                        AddNewList(onAddNewList = { onAddNewList(data.info.localId) })
                     }
                 }
             }
