@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.CreateNewButton
+import com.example.bankan.common.ui.components.SwipeableElement
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.models.ListData
@@ -24,6 +25,7 @@ import org.koin.androidx.compose.viewModel
 
 @Composable
 fun List1(data: ListData) {
+    val vm: BoardScreenViewModel by viewModel()
     BankanTheme {
         LazyColumn(
             modifier = Modifier
@@ -41,17 +43,21 @@ fun List1(data: ListData) {
                         .fillMaxWidth()
                 )
             }
-            data.content.forEach { (name, description) ->
+            data.content.forEach { card ->
                 item {
                     Spacer(modifier = Modifier.height(10.dp))
-                    if (name.isNotEmpty())
-                        Card(name = name, description = description)
-                    else
-                        NameLessCard(description)
+                    SwipeableElement(onSwipe = { vm.deleteCard(card.localId) }) {
+                        if (card.name.isNotEmpty())
+                            Card(modifier = it, name = card.name, description = card.description)
+                        else
+                            NameLessCard(modifier = it, card.description)
+                    }
                 }
             }
             item {
+                Spacer(modifier = Modifier.height(10.dp))
                 AddNewCard(listInfo = data.info)
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }
@@ -72,7 +78,8 @@ fun AddNewList(modifier: Modifier = Modifier) {
             onNameChanged = { vm.newListName.value = it },
             onSubmit = {
                 vm.addNewList(
-                    ListInfo( name = newListName, boardId = boardInfo.localId ) )
+                    ListInfo(name = newListName, boardId = boardInfo.localId)
+                )
                 vm.newListName.value = ""
                 vm.isEnteringNewListName.value = false
             }

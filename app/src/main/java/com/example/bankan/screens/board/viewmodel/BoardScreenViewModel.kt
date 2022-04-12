@@ -46,6 +46,12 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
     fun listData(): Flow<List<Pair<ListInfo, Flow<List<CardInfo>>>>> =
         listInfo().map { it.map { it to cardInfo(it.localId) } }
 
+    fun deleteCard(cardId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            cardRepository.delete(cardId)
+        }
+    }
+
     fun addNewList(listInfo: ListInfo) {
         viewModelScope.launch(Dispatchers.IO) {
             listRepository.add(listInfo)

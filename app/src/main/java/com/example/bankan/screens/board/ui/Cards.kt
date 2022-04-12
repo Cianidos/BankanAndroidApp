@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.CreateNewButton
 import com.example.bankan.common.ui.theme.BankanTheme
@@ -24,27 +23,15 @@ import com.example.bankan.data.models.ListInfo
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
 import org.koin.androidx.compose.viewModel
 
-@Preview
-@Composable
-fun CardExample() {
-    Column {
-        NameLessCard(
-            description = "Some longer text. It  must be longer? and cause of this i need to write it. I dont know why but it doesn't work without meaningfull text"
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        Card(
-            name = "Some Simple name",
-            description = "Some longer text. It  must be longer? and cause of this i need to write it. I dont know why but it doesn't work without meaningfull text"
-        )
-    }
-}
 
 @Composable
-fun NameLessCard(description: String) {
+fun NameLessCard(
+    modifier: Modifier = Modifier,
+    description: String) {
     BankanTheme {
         val tagText = "#jjjj"
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
                 .width(300.dp)
                 .aspectRatio(3.0f)
@@ -89,11 +76,11 @@ fun NameLessCard(description: String) {
 }
 
 @Composable
-fun Card(name: String, description: String) {
+fun Card(modifier: Modifier = Modifier, name: String, description: String) {
     BankanTheme {
         val tagText = "#jjjj"
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
                 .width(250.dp)
                 .aspectRatio(1.6f)

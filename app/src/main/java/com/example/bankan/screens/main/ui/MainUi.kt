@@ -1,22 +1,22 @@
 package com.example.bankan.screens.main.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.CreateNewButton
+import com.example.bankan.common.ui.components.SwipeableElement
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardInfo
@@ -24,7 +24,6 @@ import com.example.bankan.screens.main.viewmodel.MainMenuUiModel
 import com.example.bankan.screens.main.viewmodel.MainMenuUiStates
 import com.example.bankan.screens.main.viewmodel.MainMenuViewModel
 import org.koin.androidx.compose.viewModel
-import kotlin.math.roundToInt
 
 @Composable
 fun MainMenu(modifier: Modifier = Modifier, onBoardChosen: (boardId: Int) -> Unit) {
@@ -113,33 +112,8 @@ fun BoardCard(
     onDelete: () -> Unit,
     onBoardChosen: () -> Unit
 ) {
-    var contentSize: Size by remember { mutableStateOf(Size(48f, 48f)) }
-
-    val swipeableState = rememberSwipeableState(0) {
-        if (it == 1) {
-            onDelete()
-            false
-        } else true
-    }
-
-    val anchors = mapOf(0f to 0, contentSize.width to 1)
-
-    Box(
-        modifier = modifier
-            .swipeable(
-                state = swipeableState,
-                anchors = anchors,
-                thresholds = { _, _ -> FractionalThreshold(0.3f) },
-                orientation = Orientation.Horizontal
-            )
-            .background(Color.Transparent)
-    ) {
-        Card(modifier = modifier
-            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-            .onGloballyPositioned {
-                contentSize = Size(it.size.width.toFloat(), it.size.height.toFloat())
-            }, onClick = onBoardChosen
-        ) {
+    SwipeableElement(modifier = modifier, onSwipe = onDelete) {
+        Card(modifier = it, onClick = onBoardChosen) {
             Text(text = boardInfo.name)
         }
     }
