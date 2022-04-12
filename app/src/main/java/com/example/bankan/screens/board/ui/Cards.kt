@@ -27,7 +27,8 @@ import org.koin.androidx.compose.viewModel
 @Composable
 fun NameLessCard(
     modifier: Modifier = Modifier,
-    description: String) {
+    description: String
+) {
     BankanTheme {
         val tagText = "#jjjj"
         Column(
@@ -131,7 +132,7 @@ fun Card(modifier: Modifier = Modifier, name: String, description: String) {
 }
 
 @Composable
-fun AddNewCard(modifier: Modifier = Modifier,listInfo: ListInfo) {
+fun AddNewCard(modifier: Modifier = Modifier, listInfo: ListInfo) {
     val vm: BoardScreenViewModel by viewModel()
     val isEntering by vm.isEnteringNewCardName.collectAsState()
     val newListName by vm.newCardName.collectAsState()
@@ -143,7 +144,7 @@ fun AddNewCard(modifier: Modifier = Modifier,listInfo: ListInfo) {
             onCreateNew = { vm.isEnteringNewCardName.value = true },
             onNameChanged = { vm.newCardName.value = it },
             onSubmit = {
-                vm.addNewCard( CardInfo( name = newListName, listId = listInfo.localId ) )
+                vm.addNewCard(CardInfo(name = newListName, listId = listInfo.localId))
                 vm.newCardName.value = ""
                 vm.isEnteringNewCardName.value = false
             }

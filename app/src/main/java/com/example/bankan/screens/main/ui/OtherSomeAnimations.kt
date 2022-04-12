@@ -15,10 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.DragExample
+import com.example.bankan.common.ui.EachAndBetween
 import com.example.bankan.common.ui.SwipeableSample
 import com.example.bankan.common.ui.TransformableSample
 import com.example.bankan.common.ui.components.DashOutline
-import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.main.viewmodel.AnimationViewModel
 import org.koin.androidx.compose.viewModel
@@ -54,7 +54,7 @@ fun SwipeableBoardList(
     onDelete: (index: Int) -> Unit
 ) {
     Column(modifier = modifier) {
-        eachAndBetween(data = list.withIndex()) {
+        EachAndBetween(data = list.withIndex()) {
             SwipeableBoardCard(text = it.value, onDelete = { onDelete(it.index) })
         }
         Spacer(

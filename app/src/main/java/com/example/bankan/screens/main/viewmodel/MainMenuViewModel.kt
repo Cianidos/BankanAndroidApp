@@ -81,12 +81,11 @@ class MainMenuViewModel : ViewModel(), KoinComponent {
     }
 
 
-
     fun deleteBoard(localId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
-                listInfoRepository.getAll(localId).collect {
-                    it.forEach {
+                listInfoRepository.getAll(localId).collect { listOfListInfo ->
+                    listOfListInfo.forEach {
                         launch {
                             cardInfoRepository.deleteByListId(it.localId)
                         }

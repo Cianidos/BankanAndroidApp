@@ -5,7 +5,6 @@ import com.example.bankan.data.models.BoardInfo
 import kotlinx.coroutines.flow.Flow
 
 
-
 @Dao
 interface BoardInfoDao {
     @Insert

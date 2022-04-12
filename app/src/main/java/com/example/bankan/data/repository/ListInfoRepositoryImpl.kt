@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class ListInfoRepositoryImpl : ListInfoRepository, KoinComponent{
+class ListInfoRepositoryImpl : ListInfoRepository, KoinComponent {
 
     private val listDao: ListInfoDao by inject()
 

@@ -57,14 +57,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// TODO finish MainMenu
-// TODO make board screen usable
-// TODO make room/delight database
-// TODO make repositories (maybe fake firstly)
-// TODO choose dependencies strategy hoisting vs inject viewModel everywhere
 
-
-@OptIn(ExperimentalAnimationApi::class,
+@OptIn(
+    ExperimentalAnimationApi::class,
     com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi::class
 )
 @Composable
@@ -99,13 +94,13 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalAnimationApi::class)
 object BoardListAnimationStyle : DestinationStyle.Animated {
-    override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition? =
+    override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition =
         slideIntoContainer(
             towards = AnimatedContentScope.SlideDirection.Right,
             animationSpec = tween(700)
         )
 
-    override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition? =
+    override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition =
         slideOutOfContainer(
             towards = AnimatedContentScope.SlideDirection.Left,
             animationSpec = tween(700)
@@ -166,13 +161,13 @@ fun BoardScreenWithNavBar(
 
 @OptIn(ExperimentalAnimationApi::class)
 object SettingsAnimationStyle : DestinationStyle.Animated {
-    override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition? =
+    override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition =
         slideIntoContainer(
             towards = AnimatedContentScope.SlideDirection.Left,
             animationSpec = tween(700)
         )
 
-    override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition? =
+    override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition =
         slideOutOfContainer(
             towards = AnimatedContentScope.SlideDirection.Right,
             animationSpec = tween(700)
@@ -184,7 +179,6 @@ object SettingsAnimationStyle : DestinationStyle.Animated {
 fun SettingsScreen(modifier: Modifier = Modifier, nav: NavController) {
     ContentWithBottomNavBar(nav = nav) { Screen(it) }
 }
-
 
 
 @Preview
@@ -249,7 +243,6 @@ fun BottomBar(
                 selected = currentDestination == destination.direction,
                 onClick = {
                     navController.navigateTo(destination.direction) { launchSingleTop = true }
-                    //Log.d("AAAAAAAAA", "${currentDestination}, ${destination.direction} \n ${currentDestination?.route} ${destination.direction.route}")
                 },
                 icon = { Icon(destination.icon, contentDescription = stringRes) },
                 label = { Text(stringRes) },

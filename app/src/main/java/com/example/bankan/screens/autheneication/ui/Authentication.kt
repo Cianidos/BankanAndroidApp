@@ -36,7 +36,11 @@ import org.koin.androidx.compose.viewModel
 
 @Composable
 @Destination(start = true)
-fun Authentication(modifier: Modifier = Modifier, navigator: DestinationsNavigator, onAppEnter: () -> Unit = {}) {
+fun Authentication(
+    modifier: Modifier = Modifier,
+    navigator: DestinationsNavigator,
+    onAppEnter: () -> Unit = {}
+) {
     val viewModel: AuthenticationViewModel by viewModel()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -45,7 +49,7 @@ fun Authentication(modifier: Modifier = Modifier, navigator: DestinationsNavigat
             modifier = modifier.fillMaxWidth(),
             authenticationState = uiState,
             handleEvent = viewModel::handleEvent,
-            appEnter = { navigator.navigate(BoardListScreenWithNavBarDestination)}
+            appEnter = { navigator.navigate(BoardListScreenWithNavBarDestination) }
         )
     }
 }

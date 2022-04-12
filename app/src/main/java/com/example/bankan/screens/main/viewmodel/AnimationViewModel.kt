@@ -15,7 +15,7 @@ class AnimationViewModel : ViewModel() {
     private val _list = MutableStateFlow(
         listOf(
             "first board",
-            "newxt",
+            "next",
             "1",
             "",
             "board next door"

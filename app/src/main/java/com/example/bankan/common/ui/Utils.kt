@@ -23,12 +23,12 @@ inline fun Int.asDp(): Dp {
 }
 
 @Composable
-fun <T> eachAndBetween(
+fun <T> EachAndBetween(
     data: Iterable<T>,
     spacerHeight: Dp = 10.dp,
     content: @Composable (T) -> Unit
 ) {
-    eachAndBetween(data = data, between = {
+    EachAndBetween(data = data, between = {
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -38,7 +38,7 @@ fun <T> eachAndBetween(
 }
 
 @Composable
-fun <T> eachAndBetween(
+fun <T> EachAndBetween(
     data: Iterable<T>,
     between: @Composable () -> Unit,
     content: @Composable (T) -> Unit

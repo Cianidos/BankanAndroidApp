@@ -9,6 +9,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
 
+@Suppress("unused")
 class BankanApplication : Application() {
     override fun onCreate() {
         super.onCreate()

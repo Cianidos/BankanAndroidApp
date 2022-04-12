@@ -19,9 +19,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class UiState {
-
-}
 
 @OptIn(FlowPreview::class)
 class BoardScreenViewModel : ViewModel(), KoinComponent {
@@ -30,12 +27,11 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
     private val cardRepository: CardInfoRepository by inject()
     private val profileRepository: ProfileRepository by inject()
 
-    private val _boardId =
-        profileRepository.currentBoardId//.shareIn(viewModelScope, SharingStarted.Eagerly)
+    private val _boardId = profileRepository.currentBoardId
 
 
     var newListName: MutableStateFlow<String> = MutableStateFlow("")
-    var isEnteringNewListName: MutableStateFlow<Boolean> = MutableStateFlow(false )
+    var isEnteringNewListName: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     var newCardName: MutableStateFlow<String> = MutableStateFlow("")
     val isEnteringNewCardName: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -44,7 +40,7 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
     fun listInfo(): Flow<List<ListInfo>> = _boardId.flatMapConcat { listRepository.getAll(it!!) }
     fun cardInfo(listId: Int): Flow<List<CardInfo>> = cardRepository.getAll(listId = listId)
     fun listData(): Flow<List<Pair<ListInfo, Flow<List<CardInfo>>>>> =
-        listInfo().map { it.map { it to cardInfo(it.localId) } }
+        listInfo().map { listOfList -> listOfList.map { it to cardInfo(it.localId) } }
 
     fun deleteCard(cardId: Int) {
         viewModelScope.launch(Dispatchers.IO) {

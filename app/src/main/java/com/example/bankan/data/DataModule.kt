@@ -1,3 +1,5 @@
+@file:Suppress("USELESS_CAST")
+
 package com.example.bankan.data
 
 import android.content.Context
@@ -20,7 +22,13 @@ val dataModule = module {
 
     single { ProfileRepositoryInDataStoreNoInternetImpl() as ProfileRepository }
 
-    single(createdAtStart = true) { Room.databaseBuilder(get(), AppDataBase::class.java, "mysuperdb").build() }
+    single(createdAtStart = true) {
+        Room.databaseBuilder(
+            get(),
+            AppDataBase::class.java,
+            "main_database"
+        ).build()
+    }
     single { get<AppDataBase>().boardInfoDao() }
     single { get<AppDataBase>().listInfoDao() }
     single { get<AppDataBase>().cardInfoDao() }
