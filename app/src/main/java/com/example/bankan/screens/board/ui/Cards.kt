@@ -148,7 +148,7 @@ fun AddNewCard(modifier: Modifier = Modifier, listInfo: ListInfo) {
             onSubmit = {
                 vm.addNewCard(CardInfo(name = newCardName, listId = listInfo.localId))
                 vm.newCardName.value = ""
-                vm.isEnteringNewCardName.value = false
+                vm.isEnteringNewCardName.value = true
             }
         )
     }

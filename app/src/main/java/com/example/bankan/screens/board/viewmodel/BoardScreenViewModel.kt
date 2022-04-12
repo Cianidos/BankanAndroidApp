@@ -60,4 +60,12 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
             cardRepository.add(cardInfo)
         }
     }
+
+    fun discardEnterings() {
+        isEnteringNewListName.value = false
+        isEnteringNewCardName.value = false
+        newListName.value = ""
+        newCardName.value = ""
+
+    }
 }

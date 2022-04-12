@@ -1,12 +1,16 @@
 package com.example.bankan.screens.board.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
@@ -43,20 +47,28 @@ fun BoardScreenContent(
     modifier: Modifier = Modifier,
     data: BoardData,
 ) {
+    val vm: BoardScreenViewModel by viewModel()
     BankanTheme {
-        LazyColumn {
-            stickyHeader {
-                androidx.compose.material.Card {
-                    Text(text = data.info.name)
-                }
-            }
-            item {
-                LazyRow(modifier = modifier) {
-                    eachAndBetween(data = data.content) {
-                        List1(data = it)
+        Surface(modifier
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { vm.discardEnterings() }
+        ) {
+            LazyColumn {
+                stickyHeader {
+                    androidx.compose.material.Card {
+                        Text(text = data.info.name)
                     }
-                    item {
-                        AddNewList()
+                }
+                item {
+                    LazyRow(modifier = modifier) {
+                        eachAndBetween(data = data.content) {
+                            List1(data = it)
+                        }
+                        item {
+                            AddNewList()
+                        }
                     }
                 }
             }
