@@ -66,9 +66,7 @@ fun CreateNewButton(
 @OptIn(ExperimentalFoundationApi::class)
 fun Modifier.scrollToOnFocus() = composed {
     val scope = rememberCoroutineScope()
-
     val requester = remember { BringIntoViewRequester() }
-
     bringIntoViewRequester(requester).onFocusEvent {
         if (it.isFocused) {
             scope.launch {

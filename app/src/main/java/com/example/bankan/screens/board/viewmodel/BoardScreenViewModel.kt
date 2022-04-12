@@ -35,6 +35,7 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
 
     var newCardName: MutableStateFlow<String> = MutableStateFlow("")
     val isEnteringNewCardName: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val currentListCardFocus: MutableStateFlow<Int?> = MutableStateFlow(null)
 
     fun boardInfo(): Flow<BoardInfo> = _boardId.flatMapConcat { boardRepository.getOne(it!!) }
     fun listInfo(): Flow<List<ListInfo>> = _boardId.flatMapConcat { listRepository.getAll(it!!) }

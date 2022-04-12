@@ -134,16 +134,19 @@ fun Card(modifier: Modifier = Modifier, name: String, description: String) {
 fun AddNewCard(modifier: Modifier = Modifier, listInfo: ListInfo) {
     val vm: BoardScreenViewModel by viewModel()
     val isEntering by vm.isEnteringNewCardName.collectAsState()
-    val newListName by vm.newCardName.collectAsState()
+    val newCardName by vm.newCardName.collectAsState()
+    val enteringListId by vm.currentListCardFocus.collectAsState()
+    val isEnteringMe = isEntering && enteringListId == listInfo.localId
 
     BankanTheme {
         CreateNewButton(
-            isEntering = isEntering,
-            name = newListName,
-            onCreateNew = { vm.isEnteringNewCardName.value = true },
+            modifier = modifier,
+            isEntering = isEnteringMe,
+            name = newCardName,
+            onCreateNew = { vm.isEnteringNewCardName.value = true; vm.currentListCardFocus.value = listInfo.localId},
             onNameChanged = { vm.newCardName.value = it },
             onSubmit = {
-                vm.addNewCard(CardInfo(name = newListName, listId = listInfo.localId))
+                vm.addNewCard(CardInfo(name = newCardName, listId = listInfo.localId))
                 vm.newCardName.value = ""
                 vm.isEnteringNewCardName.value = false
             }
