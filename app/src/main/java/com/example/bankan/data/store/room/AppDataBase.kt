@@ -22,7 +22,7 @@ object Converters {
 }
 
 
-@Database(entities = [BoardInfo::class, ListInfo::class, CardInfo::class], version = 1)
+@Database(entities = [BoardInfo::class, ListInfo::class, CardInfo::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDataBase : RoomDatabase() {
     abstract fun boardInfoDao(): BoardInfoDao

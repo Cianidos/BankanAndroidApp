@@ -1,8 +1,11 @@
 package com.example.bankan.screens.board.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -23,6 +26,7 @@ import com.example.bankan.data.models.ListInfo
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
 import org.koin.androidx.compose.viewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun List1(data: ListData) {
     val vm: BoardScreenViewModel by viewModel()
@@ -43,15 +47,14 @@ fun List1(data: ListData) {
                         .fillMaxWidth()
                 )
             }
-            data.content.forEach { card ->
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    SwipeableElement(onSwipe = { vm.deleteCard(card.localId) }) {
-                        if (card.name.isNotEmpty())
-                            Card(modifier = it, name = card.name, description = card.description)
-                        else
-                            NameLessCard(modifier = it, card.description)
-                    }
+            items(data.content) { card ->
+                Spacer(modifier = Modifier.height(10.dp))
+                SwipeableElement(onSwipe = { vm.deleteCard(card.localId) }) {
+                    val modifier = it.animateItemPlacement(tween(500))
+                    if (card.name.isNotEmpty())
+                        Card(modifier = modifier, name = card.name, description = card.description)
+                    else
+                        NameLessCard(modifier = modifier, card.description)
                 }
             }
             item {

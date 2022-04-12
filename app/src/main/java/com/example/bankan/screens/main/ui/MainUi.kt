@@ -1,10 +1,14 @@
 package com.example.bankan.screens.main.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
@@ -68,6 +72,12 @@ fun MainMenuContent(
     }
 }
 
+@SuppressLint("ModifierFactoryExtensionFunction")
+@OptIn(ExperimentalFoundationApi::class)
+private fun LazyItemScope.animatePlacement(): Modifier
+     = Modifier.animateItemPlacement(tween(500))
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BoardList(
     modifier: Modifier = Modifier,
@@ -79,27 +89,33 @@ fun BoardList(
 ) {
     val vm: MainMenuViewModel by viewModel()
 
+
     LazyColumn(modifier = modifier) {
         eachAndBetween(data = uiModel.boardInfoList.withIndex().toList()) {
             BoardCard(
+                modifier = animatePlacement(),
                 boardInfo = it.value,
                 onBoardChosen = { onBoardChosen(it.value.localId) },
                 onDelete = { vm.deleteBoard(it.value.localId) })
         }
         item {
-            Spacer(
-                modifier = Modifier
-                    .height(10.dp)
-                    .fillMaxWidth()
-            )
+            Spacer(modifier = animatePlacement()
+                .height(10.dp)
+                .fillMaxWidth())
         }
         item {
             CreateNewBoard(
+                modifier = animatePlacement(),
                 uiModel = uiModel,
                 onCreateNewBoard = onCreateNewBoard,
                 onChangeNewBoardName = onChangeNewBoardName,
                 onSubmitNewBoard = onSubmitNewBoard
             )
+        }
+        item {
+            Spacer(modifier = animatePlacement()
+                .height(50.dp)
+                .fillMaxWidth())
         }
     }
 }

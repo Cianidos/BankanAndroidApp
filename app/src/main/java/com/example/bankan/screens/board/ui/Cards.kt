@@ -85,7 +85,6 @@ fun Card(modifier: Modifier = Modifier, name: String, description: String) {
                 .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
                 .width(250.dp)
                 .aspectRatio(1.6f)
-                .sizeIn(maxHeight = (250 * 1.6f).dp, maxWidth = 250.dp)
         ) {
             Box(
                 modifier = Modifier

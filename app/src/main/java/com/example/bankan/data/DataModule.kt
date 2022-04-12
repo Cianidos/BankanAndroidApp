@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.example.bankan.data.repository.*
 import com.example.bankan.data.store.room.AppDataBase
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 private val Context.preferences: DataStore<Preferences> by preferencesDataStore(name = "profile")
@@ -24,7 +25,7 @@ val dataModule = module {
 
     single(createdAtStart = true) {
         Room.databaseBuilder(
-            get(),
+            androidContext(),
             AppDataBase::class.java,
             "main_database"
         ).build()

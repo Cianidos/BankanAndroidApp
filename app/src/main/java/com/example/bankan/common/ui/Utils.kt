@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
@@ -56,7 +57,7 @@ fun <T> LazyListScope.eachAndBetween(
     data: List<T>,
     spacerHeight: Dp = 10.dp,
     spacerWidth: Dp = spacerHeight,
-    content: @Composable (T) -> Unit
+    content: @Composable LazyItemScope.(T) -> Unit
 ) {
     eachAndBetween(data = data, between = {
         Spacer(
@@ -70,7 +71,7 @@ fun <T> LazyListScope.eachAndBetween(
 fun <T> LazyListScope.eachAndBetween(
     data: List<T>,
     between: @Composable () -> Unit,
-    content: @Composable (T) -> Unit
+    content: @Composable LazyItemScope.(T) -> Unit
 ) {
     itemsIndexed(data) { idx, value ->
         content(value)
