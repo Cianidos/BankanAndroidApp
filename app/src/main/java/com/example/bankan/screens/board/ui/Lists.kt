@@ -64,7 +64,7 @@ fun List1(data: ListData) {
                         } while (factor < 1f)
                     }
 
-                    val modifier = it.scale(scaleY = factor, scaleX = 1f)
+                    val modifier = Modifier.scale(scaleY = factor, scaleX = 1f)
 
                     if (card.name.isNotEmpty())
                         Card(modifier = modifier, name = card.name, description = card.description)

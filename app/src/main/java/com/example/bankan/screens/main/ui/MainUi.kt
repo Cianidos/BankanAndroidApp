@@ -134,7 +134,7 @@ fun BoardCard(
     onBoardChosen: () -> Unit
 ) {
     SwipeableElement(modifier = modifier, onSwipe = onDelete) {
-        Card(modifier = it, onClick = onBoardChosen) {
+        Card(onClick = onBoardChosen) {
             Text(text = boardInfo.name)
         }
     }
