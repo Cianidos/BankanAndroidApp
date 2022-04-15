@@ -33,12 +33,14 @@ import org.koin.androidx.compose.viewModel
 fun MainMenu(modifier: Modifier = Modifier, onBoardChosen: (boardId: Int) -> Unit) {
     val vm: MainMenuViewModel by viewModel()
     val uiModel by vm.uiModel.collectAsState()
+
     MainMenuContent(
-        onBoardChosen = { vm.chooseCurrentBoard(it); onBoardChosen(it) },
         uiModel = uiModel,
+        onBoardChosen = { vm.chooseCurrentBoard(it); onBoardChosen(it) },
         onCreateNewBoard = { vm.createNewBoard() },
         onChangeNewBoardName = { vm.changeNewBoardName(it) },
-        onSubmitNewBoard = { vm.submitNewBoard() }
+        onDelete = { vm.deleteBoard(it) },
+        onSubmitNewBoard = { vm.submitNewBoard() },
     )
 }
 
@@ -50,6 +52,7 @@ fun MainMenuContent(
     onCreateNewBoard: () -> Unit,
     onChangeNewBoardName: (String) -> Unit,
     onSubmitNewBoard: () -> Unit,
+    onDelete: (boardId: Int) -> Unit,
 ) {
     val vm: MainMenuViewModel by viewModel()
     BankanTheme {
@@ -66,7 +69,8 @@ fun MainMenuContent(
                 onBoardChosen = onBoardChosen,
                 onSubmitNewBoard = onSubmitNewBoard,
                 onChangeNewBoardName = onChangeNewBoardName,
-                onCreateNewBoard = onCreateNewBoard
+                onCreateNewBoard = onCreateNewBoard,
+                onDelete = onDelete,
             )
         }
     }
@@ -74,8 +78,7 @@ fun MainMenuContent(
 
 @SuppressLint("ModifierFactoryExtensionFunction")
 @OptIn(ExperimentalFoundationApi::class)
-private fun LazyItemScope.animatePlacement(): Modifier
-     = Modifier.animateItemPlacement(tween(500))
+private fun LazyItemScope.animatePlacement(): Modifier = Modifier.animateItemPlacement(tween(500))
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -83,25 +86,25 @@ fun BoardList(
     modifier: Modifier = Modifier,
     uiModel: MainMenuUiModel,
     onBoardChosen: (boardId: Int) -> Unit,
+    onDelete: (boardId: Int) -> Unit,
     onCreateNewBoard: () -> Unit,
     onChangeNewBoardName: (String) -> Unit,
     onSubmitNewBoard: () -> Unit,
 ) {
-    val vm: MainMenuViewModel by viewModel()
-
-
     LazyColumn(modifier = modifier) {
         eachAndBetween(data = uiModel.boardInfoList.withIndex().toList()) {
             BoardCard(
                 modifier = animatePlacement(),
                 boardInfo = it.value,
                 onBoardChosen = { onBoardChosen(it.value.localId) },
-                onDelete = { vm.deleteBoard(it.value.localId) })
+                onDelete = { onDelete(it.value.localId) })
         }
         item {
-            Spacer(modifier = animatePlacement()
-                .height(10.dp)
-                .fillMaxWidth())
+            Spacer(
+                modifier = animatePlacement()
+                    .height(10.dp)
+                    .fillMaxWidth()
+            )
         }
         item {
             CreateNewBoard(
@@ -113,9 +116,11 @@ fun BoardList(
             )
         }
         item {
-            Spacer(modifier = animatePlacement()
-                .height(50.dp)
-                .fillMaxWidth())
+            Spacer(
+                modifier = animatePlacement()
+                    .height(50.dp)
+                    .fillMaxWidth()
+            )
         }
     }
 }

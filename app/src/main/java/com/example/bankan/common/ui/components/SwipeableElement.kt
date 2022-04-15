@@ -8,10 +8,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -28,9 +25,11 @@ fun SwipeableElement(
 ) {
     val contentSize: MutableState<Size> = remember { mutableStateOf(Size(48f, 48f)) }
 
+    val onSwipeState: State<() -> Unit> = rememberUpdatedState(newValue = onSwipe)
+
     val swipeableState = rememberSwipeableState(0) {
         if (it == 1) {
-            onSwipe()
+            onSwipeState.value()
             false
         } else true
     }

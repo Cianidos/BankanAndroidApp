@@ -45,7 +45,6 @@ fun List1(data: ListData) {
             )
             EachAndBetween(data = data.content) { card ->
                 SwipeableElement(onSwipe = { vm.deleteCard(card.localId) }) {
-
                     val anim = remember {
                         TargetBasedAnimation(
                             animationSpec = tween(500),

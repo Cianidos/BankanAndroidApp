@@ -1,5 +1,6 @@
 package com.example.bankan.data.repository
 
+import android.util.Log
 import com.example.bankan.data.models.CardInfo
 import com.example.bankan.data.store.room.CardInfoDao
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,8 @@ class CardInfoRepositoryImpl : CardInfoRepository, KoinComponent {
     }
 
     override suspend fun delete(localId: Int) {
-        cardDao.deleteByLocalId(localId)
+        val res = cardDao.deleteByLocalId(localId)
+        Log.d("AAAA", "Affected $res rows on local id $localId")
     }
 
     override suspend fun delete(cardInfo: CardInfo) {

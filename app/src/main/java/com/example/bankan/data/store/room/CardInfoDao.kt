@@ -16,11 +16,14 @@ interface CardInfoDao {
     suspend fun delete(vararg cards: CardInfo)
 
     @Query("DELETE FROM CardInfo WHERE localId = :cardId")
-    suspend fun deleteByLocalId(cardId: Int)
+    suspend fun deleteByLocalId(cardId: Int): Int
 
     @Query("DELETE FROM CardInfo WHERE listId = :listLocalId")
     fun deleteByListId(listLocalId: Int)
 
     @Query("SELECT * FROM CardInfo WHERE listId = :listId")
     fun getAll(listId: Int): Flow<List<CardInfo>>
+
+    @Query("SELECT * FROM CardInfo WHERE localId = :cardId")
+    fun get(cardId: Int): Flow<CardInfo>
 }
