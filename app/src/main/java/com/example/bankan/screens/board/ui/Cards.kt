@@ -1,5 +1,6 @@
 package com.example.bankan.screens.board.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,15 +21,24 @@ import com.example.bankan.common.ui.components.CreateNewButton
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.CardInfo
 import com.example.bankan.data.models.ListInfo
+import com.example.bankan.destinations.CardEditorScreenDestination
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.viewModel
 
 
 @Composable
 fun NameLessCard(
     modifier: Modifier = Modifier,
-    description: String
+    cardInfo: CardInfo
 ) {
+    val name: String = cardInfo.name
+    val description: String = cardInfo.description
+
     BankanTheme {
         val tagText = "#jjjj"
         Column(
@@ -77,7 +87,27 @@ fun NameLessCard(
 }
 
 @Composable
-fun Card(modifier: Modifier = Modifier, name: String, description: String) {
+fun Card(
+    modifier: Modifier = Modifier,
+    nav: DestinationsNavigator,
+    recipient: ResultRecipient<CardEditorScreenDestination, String>,
+    cardInfo: CardInfo
+) {
+    val vm by viewModel<BoardScreenViewModel>()
+
+    recipient.onNavResult {
+            when (it) {
+                is NavResult.Canceled -> Unit
+                is NavResult.Value -> {
+                    Log.d("NNNNNNNNN", "Accepted value ${it.value}")
+                    vm.updateCard(Json.decodeFromString(it.value))
+                }
+            }
+    }
+
+    val name: String = cardInfo.name
+    val description: String = cardInfo.description
+
     BankanTheme {
         val tagText = "#jjjj"
         Column(
@@ -100,7 +130,7 @@ fun Card(modifier: Modifier = Modifier, name: String, description: String) {
                     Text(text = tagText, modifier = Modifier, overflow = TextOverflow.Visible)
                 }
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { nav.navigate(CardEditorScreenDestination(cardInfo)) },
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1.0f)
@@ -143,7 +173,10 @@ fun AddNewCard(modifier: Modifier = Modifier, listInfo: ListInfo) {
             modifier = modifier,
             isEntering = isEnteringMe,
             name = newCardName,
-            onCreateNew = { vm.isEnteringNewCardName.value = true; vm.currentListCardFocus.value = listInfo.localId},
+            onCreateNew = {
+                vm.isEnteringNewCardName.value = true; vm.currentListCardFocus.value =
+                listInfo.localId
+            },
             onNameChanged = { vm.newCardName.value = it },
             onSubmit = {
                 vm.addNewCard(CardInfo(name = newCardName, listId = listInfo.localId))

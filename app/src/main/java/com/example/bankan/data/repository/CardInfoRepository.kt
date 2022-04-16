@@ -9,4 +9,5 @@ interface CardInfoRepository {
     suspend fun delete(localId: Int)
     suspend fun delete(cardInfo: CardInfo)
     suspend fun deleteByListId(listLocalId: Int)
+    suspend fun update(cardInfo: CardInfo)
 }

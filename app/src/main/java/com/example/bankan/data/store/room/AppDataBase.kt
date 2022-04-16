@@ -4,9 +4,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.example.bankan.data.models.*
+import com.example.bankan.data.models.BoardInfo
+import com.example.bankan.data.models.CardInfo
+import com.example.bankan.data.models.CardTag
+import com.example.bankan.data.models.ListInfo
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.*
 
 object Converters {
@@ -23,16 +27,16 @@ object Converters {
 //    fun stringToTag(value: String): CardTag = JsonCoder.decodeFromString(value)
 
     @TypeConverter
-    fun listTagToString(value: List<CardTag>): String = JsonCoder.encodeToString(value)
+    fun listTagToString(value: List<CardTag>): String = Json.encodeToString(value)
 
     @TypeConverter
-    fun stringToListTag(value: String): List<CardTag> = JsonCoder.decodeFromString(value)
+    fun stringToListTag(value: String): List<CardTag> = Json.decodeFromString(value)
 }
 
 
 @Database(
     entities = [BoardInfo::class, ListInfo::class, CardInfo::class],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

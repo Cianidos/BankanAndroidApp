@@ -37,7 +37,9 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.navigateTo
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.ramcosta.composedestinations.spec.DestinationStyle
 import com.ramcosta.composedestinations.spec.Direction
 import org.koin.androidx.compose.inject
@@ -155,8 +157,10 @@ object BoardAnimationStyle : DestinationStyle.Animated {
 fun BoardScreenWithNavBar(
     modifier: Modifier = Modifier,
     nav: NavController,
+    navD: DestinationsNavigator,
+    r: ResultRecipient<CardEditorScreenDestination, String>
 ) {
-    ContentWithBottomNavBar(nav = nav) { BoardScreen(it) }
+    ContentWithBottomNavBar(nav = nav) { BoardScreen(it, nav = navD, r = r) }
 }
 
 @OptIn(ExperimentalAnimationApi::class)

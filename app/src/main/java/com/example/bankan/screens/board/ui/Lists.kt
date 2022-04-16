@@ -22,12 +22,19 @@ import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.models.ListData
 import com.example.bankan.data.models.ListInfo
+import com.example.bankan.destinations.CardEditorScreenDestination
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.viewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun List1(data: ListData) {
+fun List1(
+    data: ListData,
+    nav: DestinationsNavigator,
+    r: ResultRecipient<CardEditorScreenDestination, String>
+) {
     val vm: BoardScreenViewModel by viewModel()
     BankanTheme {
         Column(
@@ -67,9 +74,9 @@ fun List1(data: ListData) {
                     val modifier = Modifier.scale(scaleY = factor, scaleX = 1f)
 
                     if (card.name.isNotEmpty())
-                        Card(modifier = modifier, name = card.name, description = card.description)
+                        Card(modifier = modifier, cardInfo = card, nav = nav, recipient = r)
                     else
-                        NameLessCard(modifier = modifier, card.description)
+                        NameLessCard(modifier = modifier, cardInfo = card)
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))

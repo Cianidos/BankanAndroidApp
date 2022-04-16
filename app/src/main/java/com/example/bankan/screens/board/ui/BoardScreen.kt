@@ -17,12 +17,20 @@ import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardData
 import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.models.ListData
+import com.example.bankan.destinations.CardEditorScreenDestination
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.viewModel
 
 
+
 @Composable
-fun BoardScreen(modifier: Modifier = Modifier) {
+fun BoardScreen(
+    modifier: Modifier = Modifier,
+    nav: DestinationsNavigator,
+    r: ResultRecipient<CardEditorScreenDestination, String>
+) {
     val vm: BoardScreenViewModel by viewModel()
     val boardInfo by vm.boardInfo().collectAsState(initial = BoardInfo(""))
     val listInfo by vm.listData().collectAsState(initial = emptyList())
@@ -37,7 +45,7 @@ fun BoardScreen(modifier: Modifier = Modifier) {
 
     BoardScreenContent(
         modifier = modifier,
-        data = data,
+        data = data, nav = nav, r = r
     )
 }
 
@@ -46,6 +54,8 @@ fun BoardScreen(modifier: Modifier = Modifier) {
 fun BoardScreenContent(
     modifier: Modifier = Modifier,
     data: BoardData,
+    nav: DestinationsNavigator,
+    r: ResultRecipient<CardEditorScreenDestination, String>,
 ) {
     val vm: BoardScreenViewModel by viewModel()
     BankanTheme {
@@ -64,7 +74,7 @@ fun BoardScreenContent(
                 item {
                     LazyRow(modifier = modifier) {
                         eachAndBetween(data = data.content) {
-                            List1(data = it)
+                            List1(data = it, nav = nav,r=r)
                         }
                         item {
                             AddNewList()

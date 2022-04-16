@@ -66,6 +66,11 @@ class BoardScreenViewModel : ViewModel(), KoinComponent {
         isEnteringNewCardName.value = false
         newListName.value = ""
         newCardName.value = ""
+    }
 
+    fun updateCard(cardInfo: CardInfo) {
+        viewModelScope.launch(Dispatchers.IO) {
+            cardRepository.update(cardInfo)
+        }
     }
 }
