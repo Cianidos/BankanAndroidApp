@@ -2,6 +2,7 @@ package com.example.bankan.common.ui.components
 
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 
@@ -12,11 +13,11 @@ fun SwipeableElement(
     onSwipe: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val callbackState = rememberUpdatedState(newValue = onSwipe)
+    val callbackState by rememberUpdatedState(newValue = onSwipe)
     val state = rememberDismissState {
         when (it) {
             DismissValue.Default -> Unit
-            DismissValue.DismissedToEnd -> callbackState.value()
+            DismissValue.DismissedToEnd -> callbackState()
             DismissValue.DismissedToStart -> Unit
         }
         false

@@ -28,7 +28,7 @@ val dataModule = module {
             androidContext(),
             AppDataBase::class.java,
             "main_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
     single { get<AppDataBase>().boardInfoDao() }
     single { get<AppDataBase>().listInfoDao() }
