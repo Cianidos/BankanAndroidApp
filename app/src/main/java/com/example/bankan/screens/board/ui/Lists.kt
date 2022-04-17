@@ -1,5 +1,6 @@
 package com.example.bankan.screens.board.ui
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.TargetBasedAnimation
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
@@ -37,7 +38,8 @@ fun List1(
         Column(
             modifier = Modifier
                 .background(Color.DarkGray, RoundedCornerShape(20.dp))
-                .width(280.dp),
+                .width(280.dp)
+                .animateContentSize { initialValue, targetValue -> },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(

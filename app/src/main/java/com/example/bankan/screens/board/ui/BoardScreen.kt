@@ -8,12 +8,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.example.bankan.common.ui.components.ContentWithBottomNavBar
@@ -140,6 +144,9 @@ fun BoardScreenContent(
                             AddNewList()
                         }
                     }
+                }
+                item {
+                    Spacer(modifier =Modifier.height(LocalConfiguration.current.screenHeightDp.div(2).dp))
                 }
             }
         }

@@ -67,14 +67,16 @@ fun CreateNewButton(
 fun Modifier.scrollToOnFocus() = composed {
     val scope = rememberCoroutineScope()
     val requester = remember { BringIntoViewRequester() }
-    bringIntoViewRequester(requester).onFocusEvent {
-        if (it.isFocused) {
-            scope.launch {
-                delay(250)
-                requester.bringIntoView()
+
+    bringIntoViewRequester(requester)
+        .onFocusEvent {
+            if (it.isFocused) {
+                scope.launch {
+                    delay(250)
+                    requester.bringIntoView()
+                }
             }
         }
-    }
 }
 
 fun Modifier.focusOnEntry() = composed {

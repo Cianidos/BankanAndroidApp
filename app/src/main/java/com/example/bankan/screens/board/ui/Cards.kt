@@ -14,8 +14,12 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,12 +28,13 @@ import com.example.bankan.common.ui.components.CreateNewButton
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.CardInfo
-import com.example.bankan.data.models.CardTag
 import com.example.bankan.data.models.ListInfo
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
 import com.example.bankan.screens.destinations.CardEditorScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.viewModel
@@ -70,15 +75,25 @@ fun Card(
             verticalAlignment = Alignment.Top
         ) {
             LazyRow(
-                modifier = Modifier.wrapContentSize(),
+                modifier = Modifier
+                    .wrapContentSize()
+                    .widthIn(max = 200.dp)
+                    .drawWithContent {
+                        drawContent()
+                        drawRect(
+                            brush = Brush.horizontalGradient(
+                                0.95f to Color.Transparent,
+                                1f to Color.LightGray,
+                            ),
+                            topLeft = Offset(190.dp.toPx(), 0.dp.toPx()),
+//                            size = Size(90.dp.toPx(), 30.dp.toPx())
+                        )
+                    },
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Top
             ) {
                 eachAndBetween(
-                    data = cardInfo.tags + listOf(
-                        CardTag("JJJJJ", Color.Red),
-                        CardTag("JJJJJ", Color.Red)
-                    ), spacerWidth = 5.dp
+                    data = cardInfo.tags, spacerWidth = 5.dp
                 ) { tag ->
                     Button(
                         onClick = { /*TODO*/ },
@@ -138,6 +153,7 @@ fun AddNewCard(modifier: Modifier = Modifier, listInfo: ListInfo) {
     val newCardName by vm.newCardName.collectAsState()
     val enteringListId by vm.currentListCardFocus.collectAsState()
     val isEnteringMe = isEntering && enteringListId == listInfo.localId
+    val scope = rememberCoroutineScope()
 
     BankanTheme {
         CreateNewButton(
@@ -152,7 +168,11 @@ fun AddNewCard(modifier: Modifier = Modifier, listInfo: ListInfo) {
             onSubmit = {
                 vm.addNewCard(CardInfo(name = newCardName, listId = listInfo.localId))
                 vm.newCardName.value = ""
-                vm.isEnteringNewCardName.value = true
+                scope.launch {
+                    vm.isEnteringNewCardName.value = false
+                    delay(300)
+                    vm.isEnteringNewCardName.value = true
+                }
             }
         )
     }
