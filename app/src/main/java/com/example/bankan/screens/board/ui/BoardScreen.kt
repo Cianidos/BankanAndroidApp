@@ -1,5 +1,10 @@
 package com.example.bankan.screens.board.ui
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,18 +17,69 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import com.example.bankan.common.ui.components.ContentWithBottomNavBar
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardData
 import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.models.ListData
+import com.example.bankan.destinations.BoardListScreenWithNavBarDestination
 import com.example.bankan.destinations.CardEditorScreenDestination
+import com.example.bankan.destinations.SettingsScreenDestination
+import com.example.bankan.navDestination
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
+import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.ramcosta.composedestinations.spec.DestinationStyle
 import org.koin.androidx.compose.viewModel
 
 
+@OptIn(ExperimentalAnimationApi::class)
+object BoardAnimationStyle : DestinationStyle.Animated {
+    override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition? =
+        when (initialState.navDestination) {
+            BoardListScreenWithNavBarDestination ->
+                slideIntoContainer(
+                    towards = AnimatedContentScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            SettingsScreenDestination ->
+                slideIntoContainer(
+                    towards = AnimatedContentScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            else -> null
+        }
+
+    override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition? =
+        when (targetState.navDestination) {
+            BoardListScreenWithNavBarDestination ->
+                slideOutOfContainer(
+                    towards = AnimatedContentScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            SettingsScreenDestination ->
+                slideOutOfContainer(
+                    towards = AnimatedContentScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            else -> null
+        }
+}
+
+@Destination(style = BoardAnimationStyle::class)
+@Composable
+fun BoardScreenWithNavBar(
+    modifier: Modifier = Modifier,
+    nav: NavController,
+    navD: DestinationsNavigator,
+    r: ResultRecipient<CardEditorScreenDestination, String>
+) {
+    ContentWithBottomNavBar(nav = nav) { BoardScreen(it, nav = navD, r = r) }
+}
 
 @Composable
 fun BoardScreen(
