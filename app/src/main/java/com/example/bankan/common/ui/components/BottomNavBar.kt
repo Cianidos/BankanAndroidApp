@@ -12,10 +12,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.bankan.destinations.BoardListScreenWithNavBarDestination
-import com.example.bankan.destinations.BoardScreenWithNavBarDestination
-import com.example.bankan.destinations.SettingsScreenDestination
-import com.example.bankan.navDestination
+import com.example.bankan.screens.destinations.BoardListScreenWithNavBarDestination
+import com.example.bankan.screens.destinations.BoardScreenWithNavBarDestination
+import com.example.bankan.screens.destinations.SettingsScreenDestination
+import com.example.bankan.screens.navDestination
 import com.ramcosta.composedestinations.navigation.navigateTo
 import com.ramcosta.composedestinations.spec.Direction
 

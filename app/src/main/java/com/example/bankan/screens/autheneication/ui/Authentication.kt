@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bankan.R
 import com.example.bankan.common.ui.theme.BankanTheme
-import com.example.bankan.destinations.BoardListScreenWithNavBarDestination
 import com.example.bankan.screens.autheneication.viewmodel.*
+import com.example.bankan.screens.destinations.BoardListScreenWithNavBarDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.viewModel

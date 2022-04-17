@@ -4,20 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import com.example.bankan.NavGraphs
 import com.example.bankan.common.ui.theme.BankanTheme
-import com.example.bankan.destinations.AuthenticationDestination
-import com.example.bankan.destinations.BoardListScreenWithNavBarDestination
-import com.example.bankan.destinations.LoadingScreenDestination
+import com.example.bankan.screens.NavGraphs
+import com.example.bankan.screens.destinations.AuthenticationDestination
+import com.example.bankan.screens.destinations.BoardListScreenWithNavBarDestination
+import com.example.bankan.screens.destinations.LoadingScreenDestination
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
-import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.viewModel
 
 
@@ -28,7 +25,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             BankanTheme {
                 BankanApp()
-//                ExperimentalAnimationNav()
             }
         }
     }
@@ -60,8 +56,4 @@ fun BankanApp() {
         )
     }
 }
-
-
-
-
 

@@ -31,7 +31,7 @@ import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.repository.ProfileRepository
-import com.example.bankan.destinations.BoardScreenWithNavBarDestination
+import com.example.bankan.screens.destinations.BoardScreenWithNavBarDestination
 import com.example.bankan.screens.main.viewmodel.MainMenuUiModel
 import com.example.bankan.screens.main.viewmodel.MainMenuUiStates
 import com.example.bankan.screens.main.viewmodel.MainMenuViewModel

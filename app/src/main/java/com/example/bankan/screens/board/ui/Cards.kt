@@ -21,8 +21,8 @@ import com.example.bankan.common.ui.components.CreateNewButton
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.CardInfo
 import com.example.bankan.data.models.ListInfo
-import com.example.bankan.destinations.CardEditorScreenDestination
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
+import com.example.bankan.screens.destinations.CardEditorScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
