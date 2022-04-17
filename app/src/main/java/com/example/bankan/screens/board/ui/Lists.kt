@@ -70,10 +70,7 @@ fun List1(
 
                     val modifier = Modifier.scale(scaleY = factor, scaleX = 1f)
 
-                    if (card.name.isNotEmpty())
-                        Card(modifier = modifier, cardInfo = card, nav = nav)
-                    else
-                        NameLessCard(modifier = modifier, cardInfo = card)
+                    Card(modifier = modifier, cardInfo = card, nav = nav)
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))

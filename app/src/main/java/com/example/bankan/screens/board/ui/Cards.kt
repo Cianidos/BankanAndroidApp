@@ -1,8 +1,11 @@
 package com.example.bankan.screens.board.ui
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
@@ -18,8 +21,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.CreateNewButton
+import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.CardInfo
+import com.example.bankan.data.models.CardTag
 import com.example.bankan.data.models.ListInfo
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
 import com.example.bankan.screens.destinations.CardEditorScreenDestination
@@ -31,61 +36,6 @@ import org.koin.androidx.compose.viewModel
 
 
 @Composable
-fun NameLessCard(
-    modifier: Modifier = Modifier,
-    cardInfo: CardInfo
-) {
-    val name: String = cardInfo.name
-    val description: String = cardInfo.description
-
-    BankanTheme {
-        val tagText = "#jjjj"
-        Column(
-            modifier = modifier
-                .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
-                .width(300.dp)
-                .aspectRatio(3.0f)
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(32.dp)
-                    .fillMaxWidth()
-            ) {
-                Button(
-                    onClick = { /*TODO*/ },
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                ) {
-                    Text(text = tagText, modifier = Modifier, overflow = TextOverflow.Visible)
-                }
-                IconButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1.0f)
-                        .align(Alignment.TopEnd)
-                ) {
-                    Icon(
-                        Icons.Outlined.Settings,
-                        "edit",
-                        modifier = Modifier,
-                        tint = Color.DarkGray
-                    )
-                }
-            }
-            ClickableText(
-                text = buildAnnotatedString { append(description) },
-                style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(5.dp),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            ) {}
-        }
-    }
-}
-
-@Composable
 fun Card(
     modifier: Modifier = Modifier,
     nav: DestinationsNavigator,
@@ -94,59 +44,82 @@ fun Card(
     val vm by viewModel<BoardScreenViewModel>()
 
     LocalRecipient.current.onNavResult {
-            when (it) {
-                is NavResult.Canceled -> Unit
-                is NavResult.Value -> {
-                    Log.d("NNNNNNNNN", "Accepted value ${it.value}")
-                    vm.updateCard(Json.decodeFromString(it.value))
-                }
+        when (it) {
+            is NavResult.Canceled -> Unit
+            is NavResult.Value -> {
+                Log.d("NNNNNNNNN", "Accepted value ${it.value}")
+                vm.updateCard(Json.decodeFromString(it.value))
             }
+        }
     }
 
     val name: String = cardInfo.name
     val description: String = cardInfo.description
 
-    BankanTheme {
-        val tagText = "#jjjj"
-        Column(
-            modifier = modifier
-                .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
-                .width(250.dp)
-                .aspectRatio(1.6f)
+    Column(
+        modifier = modifier
+            .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
+            .width(250.dp)
+            .wrapContentHeight(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(30.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
         ) {
-            Box(
-                modifier = Modifier
-                    .height(32.dp)
-                    .fillMaxWidth()
+            LazyRow(
+                modifier = Modifier.wrapContentSize(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.Top
             ) {
-                Button(
-                    onClick = { /*TODO*/ },
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                ) {
-                    Text(text = tagText, modifier = Modifier, overflow = TextOverflow.Visible)
+                eachAndBetween(
+                    data = cardInfo.tags + listOf(
+                        CardTag("JJJJJ", Color.Red),
+                        CardTag("JJJJJ", Color.Red)
+                    ), spacerWidth = 5.dp
+                ) { tag ->
+                    Button(
+                        onClick = { /*TODO*/ },
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.defaultMinSize(1.dp, 1.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = tag.color)
+                    ) {
+                        Text(
+                            text = tag.name,
+                            modifier = Modifier,
+                            overflow = TextOverflow.Visible
+                        )
+                    }
                 }
-                IconButton(
-                    onClick = { nav.navigate(CardEditorScreenDestination(cardInfo)) },
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1.0f)
-                        .align(Alignment.TopEnd)
-                ) {
-                    Icon(
-                        Icons.Outlined.Settings,
-                        "edit",
-                        modifier = Modifier,
-                        tint = Color.DarkGray
-                    )
+                item {
+                    Spacer(modifier = Modifier.size(10.dp))
                 }
             }
+
+            IconButton(
+                onClick = { nav.navigate(CardEditorScreenDestination(cardInfo)) },
+                modifier = Modifier
+                    .wrapContentSize()
+                    .offset(x = 10.dp)
+            ) {
+                Icon(
+                    Icons.Outlined.Settings,
+                    "edit",
+                    modifier = Modifier.defaultMinSize(1.dp, 1.dp),
+                    tint = Color.DarkGray
+                )
+            }
+        }
+        AnimatedVisibility(visible = name.isNotEmpty()) {
             Text(
                 text = name,
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(8.dp, 0.dp)
             )
+        }
+        AnimatedVisibility(visible = description.isNotEmpty()) {
             ClickableText(
                 text = buildAnnotatedString { append(description) },
                 style = MaterialTheme.typography.body1,
@@ -184,3 +157,5 @@ fun AddNewCard(modifier: Modifier = Modifier, listInfo: ListInfo) {
         )
     }
 }
+
+val Modifier.debugBorder get() = this.border(1.dp, color = Color.Blue)
