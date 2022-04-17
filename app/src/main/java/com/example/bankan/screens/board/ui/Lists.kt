@@ -23,9 +23,7 @@ import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.models.ListData
 import com.example.bankan.data.models.ListInfo
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
-import com.example.bankan.screens.destinations.CardEditorScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.result.ResultRecipient
 import org.koin.androidx.compose.viewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -33,7 +31,6 @@ import org.koin.androidx.compose.viewModel
 fun List1(
     data: ListData,
     nav: DestinationsNavigator,
-    r: ResultRecipient<CardEditorScreenDestination, String>
 ) {
     val vm: BoardScreenViewModel by viewModel()
     BankanTheme {
@@ -74,7 +71,7 @@ fun List1(
                     val modifier = Modifier.scale(scaleY = factor, scaleX = 1f)
 
                     if (card.name.isNotEmpty())
-                        Card(modifier = modifier, cardInfo = card, nav = nav, recipient = r)
+                        Card(modifier = modifier, cardInfo = card, nav = nav)
                     else
                         NameLessCard(modifier = modifier, cardInfo = card)
                 }

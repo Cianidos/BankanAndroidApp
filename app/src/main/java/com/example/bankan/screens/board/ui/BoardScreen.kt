@@ -12,10 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -32,6 +29,7 @@ import com.example.bankan.screens.destinations.SettingsScreenDestination
 import com.example.bankan.screens.navDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.ramcosta.composedestinations.spec.DestinationStyle
 import org.koin.androidx.compose.viewModel
@@ -46,7 +44,7 @@ object BoardAnimationStyle : DestinationStyle.Animated {
                     towards = AnimatedContentScope.SlideDirection.Left,
                     animationSpec = tween(700)
                 )
-            com.example.bankan.screens.destinations.SettingsScreenDestination ->
+            SettingsScreenDestination ->
                 slideIntoContainer(
                     towards = AnimatedContentScope.SlideDirection.Right,
                     animationSpec = tween(700)
@@ -71,6 +69,11 @@ object BoardAnimationStyle : DestinationStyle.Animated {
 }
 
 
+@Suppress("USELESS_CAST")
+val LocalRecipient = compositionLocalOf {
+    EmptyResultRecipient<CardEditorScreenDestination, String>() as ResultRecipient<CardEditorScreenDestination, String>
+}
+
 @Destination(style = BoardAnimationStyle::class)
 @Composable
 fun BoardScreenWithNavBar(
@@ -79,14 +82,15 @@ fun BoardScreenWithNavBar(
     navD: DestinationsNavigator,
     r: ResultRecipient<CardEditorScreenDestination, String>
 ) {
-    ContentWithBottomNavBar(nav = nav) { BoardScreen(it, nav = navD, r = r) }
+    CompositionLocalProvider (LocalRecipient provides r) {
+        ContentWithBottomNavBar(nav = nav) { BoardScreen(it, nav = navD) }
+    }
 }
 
 @Composable
 fun BoardScreen(
     modifier: Modifier = Modifier,
     nav: DestinationsNavigator,
-    r: ResultRecipient<CardEditorScreenDestination, String>
 ) {
     val vm: BoardScreenViewModel by viewModel()
     val boardInfo by vm.boardInfo().collectAsState(initial = BoardInfo(""))
@@ -102,7 +106,7 @@ fun BoardScreen(
 
     BoardScreenContent(
         modifier = modifier,
-        data = data, nav = nav, r = r
+        data = data, nav = nav
     )
 }
 
@@ -112,7 +116,6 @@ fun BoardScreenContent(
     modifier: Modifier = Modifier,
     data: BoardData,
     nav: DestinationsNavigator,
-    r: ResultRecipient<CardEditorScreenDestination, String>,
 ) {
     val vm: BoardScreenViewModel by viewModel()
     BankanTheme {
@@ -131,7 +134,7 @@ fun BoardScreenContent(
                 item {
                     LazyRow(modifier = modifier) {
                         eachAndBetween(data = data.content) {
-                            List1(data = it, nav = nav,r=r)
+                            List1(data = it, nav = nav)
                         }
                         item {
                             AddNewList()

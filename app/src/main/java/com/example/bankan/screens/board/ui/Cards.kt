@@ -25,7 +25,6 @@ import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
 import com.example.bankan.screens.destinations.CardEditorScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.viewModel
@@ -90,12 +89,11 @@ fun NameLessCard(
 fun Card(
     modifier: Modifier = Modifier,
     nav: DestinationsNavigator,
-    recipient: ResultRecipient<CardEditorScreenDestination, String>,
     cardInfo: CardInfo
 ) {
     val vm by viewModel<BoardScreenViewModel>()
 
-    recipient.onNavResult {
+    LocalRecipient.current.onNavResult {
             when (it) {
                 is NavResult.Canceled -> Unit
                 is NavResult.Value -> {
