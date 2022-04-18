@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
@@ -77,7 +78,7 @@ fun Card(
             LazyRow(
                 modifier = Modifier
                     .wrapContentSize()
-                    .widthIn(max = 200.dp)
+                    .widthIn(max = 210.dp)
                     .drawWithContent {
                         drawContent()
                         drawRect(
@@ -86,7 +87,7 @@ fun Card(
                                 1f to Color.LightGray,
                             ),
                             topLeft = Offset(190.dp.toPx(), 0.dp.toPx()),
-//                            size = Size(90.dp.toPx(), 30.dp.toPx())
+                            size = Size(25.dp.toPx(), 30.dp.toPx())
                         )
                     },
                 horizontalArrangement = Arrangement.Start,
