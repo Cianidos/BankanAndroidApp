@@ -5,24 +5,27 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.CreateNewButton
+import com.example.bankan.common.ui.components.DashOutline
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.data.models.CardInfo
 import com.example.bankan.data.models.CardTag
+import com.google.accompanist.flowlayout.FlowRow
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
@@ -33,6 +36,10 @@ import kotlinx.serialization.json.Json
 object CardEditorScreenStyle : DestinationStyle.Animated {
 }
 
+fun <S, T> List<S>.cartesianProduct(other: List<T>): List<Pair<S, T>> =
+    flatMap { s -> List(other.size) { s }.zip(other) }
+
+@OptIn(ExperimentalMaterialApi::class)
 @Destination(style = CardEditorScreenStyle::class)
 @Composable
 fun CardEditorScreen(
@@ -41,12 +48,47 @@ fun CardEditorScreen(
     initialCardInfo: CardInfo
 ) {
     var card by remember { mutableStateOf(initialCardInfo.copy()) }
+
     val tagList: SnapshotStateList<CardTag> = remember { card.tags.toMutableStateList() }
 
     var isEntering by remember { mutableStateOf(false) }
     var newTagName by remember { mutableStateOf("") }
 
+    var currentColorIndex by remember { mutableStateOf(0) }
+
+    var currentSelectedTag by remember { mutableStateOf<Int?>(null) }
+
+    val focusRequesters =
+        remember { (tagList.map { FocusRequester() } + FocusRequester() + FocusRequester()).toMutableStateList() }
+
+    val colorsList = listOf(
+        Color.Red,
+        Color.Magenta,
+        Color.Yellow,
+        Color.Green,
+        Color.Blue,
+        Color.Cyan,
+//        Color.White,
+//        Color.Black
+    ).let { it.cartesianProduct(it) }.map { (f, s) ->
+        Color(
+            (f.red + s.red) / 2,
+            (f.green + s.green) / 2,
+            (f.blue + f.blue) / 2
+        )
+    }.toSet().flatMap { c ->
+        List(4) {
+            val t = it + 1
+            Color(
+                c.red.plus(c.red / t) / 2,
+                c.green.plus(c.green / t) / 2,
+                c.blue.plus(c.blue / t) / 2
+            )
+        }
+    }.toSet().toList()
+
     Surface(
+        onClick = { isEntering = false; currentSelectedTag = null; newTagName = ""; focusRequesters.forEach { it.freeFocus() } },
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp)
@@ -75,17 +117,27 @@ fun CardEditorScreen(
                                 shape = RoundedCornerShape(20.dp),
                                 modifier = Modifier
                                     .defaultMinSize(1.dp, 1.dp)
-                                    .height(40.dp)
+                                    .height(30.dp)
                                     .wrapContentWidth(),
                                 color = tag.color
                             ) {
                                 Column(
+                                    modifier = Modifier.padding(horizontal = 10.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
                                 ) {
                                     BasicTextField(
                                         value = tag.name,
-                                        modifier = Modifier.widthIn(min = 10.dp, max = 100.dp),
+                                        modifier = Modifier
+                                            .focusRequester(focusRequesters[idx])
+                                            .width(IntrinsicSize.Min)
+                                            .onFocusEvent {
+                                                if (it.isFocused) {
+                                                    currentColorIndex =
+                                                        colorsList.indexOf(tag.color)
+                                                    currentSelectedTag = idx
+                                                }
+                                            },
                                         singleLine = true,
                                         onValueChange = {
                                             tagList[idx] = tagList[idx].copy(name = it)
@@ -99,14 +151,17 @@ fun CardEditorScreen(
                         }
                         item {
                             CreateNewButton(
+                                modifier = Modifier.width(IntrinsicSize.Min),
                                 isEntering = isEntering,
                                 name = newTagName,
                                 onCreateNew = { newTagName = ""; isEntering = true },
                                 onNameChanged = { newTagName = it },
                                 onSubmit = {
                                     isEntering = false
-
-                                    tagList += CardTag(newTagName, Color.Green)
+                                    tagList += CardTag(
+                                        newTagName,
+                                        colorsList[currentColorIndex]
+                                    )
                                 }
                             )
                         }
@@ -116,6 +171,7 @@ fun CardEditorScreen(
                 item {
                     TextField(
                         modifier = Modifier
+                            .focusRequester(focusRequesters[focusRequesters.lastIndex - 1])
                             .fillMaxWidth()
                             .animateContentSize { initialValue, targetValue -> },
                         value = card.name,
@@ -126,6 +182,7 @@ fun CardEditorScreen(
                 item {
                     TextField(
                         modifier = Modifier
+                            .focusRequester(focusRequesters.last())
                             .fillMaxWidth()
                             .animateContentSize { initialValue, targetValue -> },
                         value = card.description,
@@ -143,6 +200,38 @@ fun CardEditorScreen(
                             modifier = Modifier.heightIn(min = 20.dp),
                             onClick = { resultNav.navigateBack(Json.encodeToString(card.copy(tags = tagList.toList()))) }) {
                             Icon(Icons.Outlined.Check, contentDescription = null)
+                        }
+                    }
+                }
+                item {
+                    FlowRow {
+                        colorsList.forEachIndexed { idx, color ->
+                            if (idx == currentColorIndex) {
+                                DashOutline {
+                                    Surface(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .padding(5.dp),
+                                        shape = CircleShape,
+                                        color = color
+                                    ) { }
+                                }
+                            } else {
+                                Surface(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .padding(5.dp),
+                                    shape = CircleShape,
+                                    color = color,
+                                    onClick = {
+                                        currentColorIndex = idx
+                                        currentSelectedTag?.let {
+                                            tagList[it] =
+                                                tagList[it].copy(color = colorsList[currentColorIndex])
+                                        }
+                                    }
+                                ) { }
+                            }
                         }
                     }
                 }

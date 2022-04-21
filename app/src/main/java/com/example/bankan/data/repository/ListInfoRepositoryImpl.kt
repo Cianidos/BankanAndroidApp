@@ -22,7 +22,7 @@ class ListInfoRepositoryImpl : ListInfoRepository, KoinComponent {
         listDao.deleteByLocalId(localId)
     }
 
-    override suspend fun delete(boardInfo: ListInfo) {
-        listDao.delete(boardInfo)
+    override suspend fun delete(listInfo: ListInfo) {
+        listDao.delete(listInfo)
     }
 }
