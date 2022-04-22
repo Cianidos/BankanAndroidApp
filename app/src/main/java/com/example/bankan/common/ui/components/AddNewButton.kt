@@ -3,6 +3,7 @@ package com.example.bankan.common.ui.components
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,6 +24,8 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import kotlinx.coroutines.delay
@@ -38,6 +41,7 @@ fun CreateNewButton(
     onNameChanged: (String) -> Unit,
     onSubmit: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
     DashOutline(modifier = modifier) {
         AnimatedContent(
             targetState = isEntering,
@@ -46,6 +50,7 @@ fun CreateNewButton(
         { targetState ->
             if (targetState) TextField(
                 modifier = Modifier
+                    .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
                     .scrollToOnFocus()
                     .focusOnEntry(),
                 value = name,

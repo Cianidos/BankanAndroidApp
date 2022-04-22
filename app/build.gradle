@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -79,7 +79,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0"
 
 
-    def nav_version = "2.5.0-alpha04"
+    def nav_version = "2.5.0-beta01"
     implementation "androidx.navigation:navigation-compose:$nav_version"
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
     implementation 'io.github.raamcosta.compose-destinations:animations-core:1.4.4-beta'

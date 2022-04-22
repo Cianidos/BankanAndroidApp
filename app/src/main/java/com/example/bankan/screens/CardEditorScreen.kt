@@ -15,10 +15,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.CreateNewButton
 import com.example.bankan.common.ui.components.DashOutline
@@ -47,6 +46,9 @@ fun CardEditorScreen(
     resultNav: ResultBackNavigator<String>,
     initialCardInfo: CardInfo
 ) {
+
+    val focusManager = LocalFocusManager.current
+
     var card by remember { mutableStateOf(initialCardInfo.copy()) }
 
     val tagList: SnapshotStateList<CardTag> = remember { card.tags.toMutableStateList() }
@@ -57,9 +59,6 @@ fun CardEditorScreen(
     var currentColorIndex by remember { mutableStateOf(0) }
 
     var currentSelectedTag by remember { mutableStateOf<Int?>(null) }
-
-    val focusRequesters =
-        remember { (tagList.map { FocusRequester() } + FocusRequester() + FocusRequester()).toMutableStateList() }
 
     val colorsList = listOf(
         Color.Red,
@@ -88,7 +87,7 @@ fun CardEditorScreen(
     }.toSet().toList()
 
     Surface(
-        onClick = { isEntering = false; currentSelectedTag = null; newTagName = ""; focusRequesters.forEach { it.freeFocus() } },
+        onClick = { isEntering = false; currentSelectedTag = null; newTagName = ""; focusManager.clearFocus() },
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp)
@@ -129,7 +128,6 @@ fun CardEditorScreen(
                                     BasicTextField(
                                         value = tag.name,
                                         modifier = Modifier
-                                            .focusRequester(focusRequesters[idx])
                                             .width(IntrinsicSize.Min)
                                             .onFocusEvent {
                                                 if (it.isFocused) {
@@ -171,7 +169,6 @@ fun CardEditorScreen(
                 item {
                     TextField(
                         modifier = Modifier
-                            .focusRequester(focusRequesters[focusRequesters.lastIndex - 1])
                             .fillMaxWidth()
                             .animateContentSize { initialValue, targetValue -> },
                         value = card.name,
@@ -182,7 +179,6 @@ fun CardEditorScreen(
                 item {
                     TextField(
                         modifier = Modifier
-                            .focusRequester(focusRequesters.last())
                             .fillMaxWidth()
                             .animateContentSize { initialValue, targetValue -> },
                         value = card.description,
