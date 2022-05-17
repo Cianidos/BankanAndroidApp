@@ -2,6 +2,8 @@ package com.example.bankan.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
+import com.example.bankan.data.network.MyHttpClient
+import com.example.bankan.data.network.payload.request.LoginRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
@@ -15,16 +17,17 @@ interface ProfileRepository {
     val isGuest: Flow<Boolean>
     val userId: Flow<Int>
     val userName: Flow<String>
-    val sessionToken: String
+    val sessionToken: Flow<String?>
     val currentBoardId: Flow<Int?>
 
     suspend fun setUserName(name: String)
-    fun authorize(login: String, password: String)
+    suspend fun authorize(login: String, password: String)
     suspend fun continueAsGuest(userName: String)
     suspend fun setNewCurrentBoardId(localId: Int)
 }
 
 object PreferencesKeys {
+    val sessionToken = stringPreferencesKey("SESSION_TOKEN")
     val isAuthorized = booleanPreferencesKey("AUTHORIZED")
     val isGuest = booleanPreferencesKey("AUTHORIZED")
     val userId = intPreferencesKey("USER_ID")
@@ -60,16 +63,24 @@ class ProfileRepositoryInDataStoreNoInternetImpl : ProfileRepository, KoinCompon
         }
     }
 
-    override val sessionToken: String
-        get() = TODO("Not yet implemented")
+    override val sessionToken: Flow<String?>
+        get() = preferences.data.map {
+            it[PreferencesKeys.sessionToken]
+        }
 
     override val currentBoardId: Flow<Int?>
         get() = preferences.data.map {
             it[PreferencesKeys.boardId]
         }
 
-    override fun authorize(login: String, password: String) {
-        TODO("Not yet implemented")
+    override suspend fun authorize(login: String, password: String) {
+        val resp = MyHttpClient.AuthenticationApi.authenticateUser(LoginRequest(login, password))
+        preferences.edit {
+            it[PreferencesKeys.sessionToken] = resp.accessToken
+            it[PreferencesKeys.isAuthorized] = true
+            it[PreferencesKeys.isGuest] = false
+            it[PreferencesKeys.username] = resp.login
+        }
     }
 
     override suspend fun continueAsGuest(userName: String) {

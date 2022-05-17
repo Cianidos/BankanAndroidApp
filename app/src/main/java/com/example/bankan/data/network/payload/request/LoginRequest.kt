@@ -1,5 +1,8 @@
 package com.example.bankan.data.network.payload.request
 
+import io.ktor.resources.*
+import kotlinx.serialization.Serializable
+
 
 data class LoginRequest(
     var login: String,

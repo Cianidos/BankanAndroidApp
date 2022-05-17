@@ -13,15 +13,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-@Composable
-inline fun Float.asDp(): Dp {
-    return with(LocalDensity.current) { this@asDp.toDp() }
-}
-
-@Composable
-inline fun Int.asDp(): Dp {
-    return with(LocalDensity.current) { this@asDp.toDp() }
-}
 
 @Composable
 fun <T> EachAndBetween(
