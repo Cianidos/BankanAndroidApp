@@ -55,7 +55,8 @@ android {
 }
 
 dependencies {
-    def accompanist_version = "0.24.8-beta"
+    // error with animations if "0.24.8-beta"
+    def accompanist_version = "0.24.7-alpha"
 
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
