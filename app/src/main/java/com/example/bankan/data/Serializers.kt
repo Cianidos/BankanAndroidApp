@@ -1,5 +1,6 @@
 package com.example.bankan.data
 
+import androidx.compose.ui.graphics.Color
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -20,4 +21,15 @@ object DateSerializer : KSerializer<Date> {
     override val descriptor = PrimitiveSerialDescriptor("Date", PrimitiveKind.LONG)
     override fun serialize(encoder: Encoder, value: Date) = encoder.encodeLong(value.time)
     override fun deserialize(decoder: Decoder): Date = Date(decoder.decodeLong())
+}
+
+object ColorSerializer: KSerializer<Color> {
+    override fun deserialize(decoder: Decoder): Color = Color(decoder.decodeString().toULong())
+
+    override val descriptor: SerialDescriptor
+        get() = PrimitiveSerialDescriptor("compose.Color", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: Color) {
+        encoder.encodeString(value.value.toString())
+    }
 }
