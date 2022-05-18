@@ -26,11 +26,11 @@ import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardData
 import com.example.bankan.data.models.BoardInfo
 import com.example.bankan.data.models.ListData
+import com.example.bankan.screens.appDestination
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
 import com.example.bankan.screens.destinations.BoardListScreenWithNavBarDestination
 import com.example.bankan.screens.destinations.CardEditorScreenDestination
 import com.example.bankan.screens.destinations.SettingsScreenDestination
-import com.example.bankan.screens.navDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultRecipient
@@ -42,7 +42,7 @@ import org.koin.androidx.compose.viewModel
 @OptIn(ExperimentalAnimationApi::class)
 object BoardAnimationStyle : DestinationStyle.Animated {
     override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition? =
-        when (initialState.navDestination) {
+        when (initialState.appDestination()) {
             BoardListScreenWithNavBarDestination ->
                 slideIntoContainer(
                     towards = AnimatedContentScope.SlideDirection.Left,
@@ -57,7 +57,7 @@ object BoardAnimationStyle : DestinationStyle.Animated {
         }
 
     override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition? =
-        when (targetState.navDestination) {
+        when (targetState.appDestination()) {
             BoardListScreenWithNavBarDestination ->
                 slideOutOfContainer(
                     towards = AnimatedContentScope.SlideDirection.Right,
@@ -99,7 +99,6 @@ fun BoardScreen(
     val vm: BoardScreenViewModel by viewModel()
     val boardInfo by vm.boardInfo().collectAsState(initial = BoardInfo(""))
     val listInfo by vm.listData().collectAsState(initial = emptyList())
-
 
     val cardInfo: List<ListData> = listInfo.map {
         val cardList by it.second.collectAsState(initial = emptyList())

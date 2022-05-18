@@ -24,6 +24,7 @@ interface ProfileRepository {
     suspend fun authorize(login: String, password: String)
     suspend fun continueAsGuest(userName: String)
     suspend fun setNewCurrentBoardId(localId: Int)
+    suspend fun logout()
 }
 
 object PreferencesKeys {
@@ -94,6 +95,14 @@ class ProfileRepositoryInDataStoreNoInternetImpl : ProfileRepository, KoinCompon
     override suspend fun setNewCurrentBoardId(localId: Int) {
         preferences.edit {
             it[PreferencesKeys.boardId] = localId
+        }
+    }
+
+    override suspend fun logout() {
+        preferences.edit {
+            it[PreferencesKeys.isAuthorized] = false
+            it[PreferencesKeys.isGuest] = false
+            it[PreferencesKeys.sessionToken] = ""
         }
     }
 }

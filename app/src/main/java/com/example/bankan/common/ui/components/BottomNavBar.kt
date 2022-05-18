@@ -11,12 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.bankan.screens.appDestination
 import com.example.bankan.screens.destinations.BoardListScreenWithNavBarDestination
 import com.example.bankan.screens.destinations.BoardScreenWithNavBarDestination
 import com.example.bankan.screens.destinations.SettingsScreenDestination
-import com.example.bankan.screens.navDestination
-import com.ramcosta.composedestinations.navigation.navigateTo
+import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.Direction
 
 @Composable
@@ -58,7 +59,7 @@ enum class BottomBarDestination(
 fun BottomBar(
     navController: NavController
 ) {
-    val currentDestination = navController.currentBackStackEntryAsState().value?.navDestination
+    val currentDestination = navController.currentBackStackEntryAsState().value?.appDestination()
 
     BottomNavigation {
         BottomBarDestination.values().forEach { destination ->
@@ -66,7 +67,9 @@ fun BottomBar(
             BottomNavigationItem(
                 selected = currentDestination == destination.direction,
                 onClick = {
-                    navController.navigateTo(destination.direction) { launchSingleTop = true }
+                    navController.navigate(destination.direction, fun NavOptionsBuilder.() {
+                        launchSingleTop = true
+                    })
                 },
                 icon = { Icon(destination.icon, contentDescription = stringRes) },
                 label = { Text(stringRes) },

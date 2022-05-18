@@ -48,12 +48,6 @@ object ColorSerializer: KSerializer<Color> {
     }
 }
 
-//private val module = SerializersModule {
-//    contextual(ColorSerializer)
-//}
-//
-//val JsonCoder = Json { serializersModule = module }
-
 @Serializable
 data class CardTag(
     val name: String,

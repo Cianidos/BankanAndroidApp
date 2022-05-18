@@ -36,7 +36,7 @@ import com.example.bankan.screens.main.viewmodel.MainMenuUiModel
 import com.example.bankan.screens.main.viewmodel.MainMenuUiStates
 import com.example.bankan.screens.main.viewmodel.MainMenuViewModel
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.navigateTo
+import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.DestinationStyle
 import org.koin.androidx.compose.inject
 import org.koin.androidx.compose.viewModel
@@ -62,7 +62,7 @@ object BoardListAnimationStyle : DestinationStyle.Animated {
 fun BoardListScreenWithNavBar(modifier: Modifier = Modifier, nav: NavController) {
     val profileRepository: ProfileRepository by inject()
     ContentWithBottomNavBar(nav = nav) {
-        MainMenu(it) { boardId -> nav.navigateTo(BoardScreenWithNavBarDestination) }
+        MainMenu(it) { boardId -> nav.navigate(BoardScreenWithNavBarDestination) }
     }
 }
 
