@@ -12,6 +12,7 @@ import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
@@ -34,14 +35,15 @@ object MyHttpClient : KoinComponent {
         }
     }
 
-    private const val baseUrl: String = "http://localhost:8080"
+    private const val baseUrl: String = "http://127.0.0.1:8080"
 
     private val client: HttpClient = HttpClient(Android) {
         install(ContentNegotiation) {
             json(
                 Json {
                     prettyPrint = true
-                }
+                    ignoreUnknownKeys = true
+                },
             )
         }
         install(Auth) {
@@ -72,9 +74,14 @@ object MyHttpClient : KoinComponent {
             }
         }
 
-        suspend fun authenticateUser(loginRequest: LoginRequest): JwtResponse =
-            client.post(urlString = "$baseUrl$apiAuthUrl/login") { setBody(body = loginRequest) }
-                .body()
+        suspend fun authenticateUser(loginRequest: LoginRequest): JwtResponse? {
+            val resp: HttpResponse =
+                client.post(urlString = "$baseUrl$apiAuthUrl/signin") { setBody(body = loginRequest) }
+            return when (resp.status) {
+                HttpStatusCode.OK -> resp.body()
+                else -> null
+            }
+        }
     }
 
     object UserApi {

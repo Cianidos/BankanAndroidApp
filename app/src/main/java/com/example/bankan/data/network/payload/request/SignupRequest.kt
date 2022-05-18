@@ -1,9 +1,11 @@
 package com.example.bankan.data.network.payload.request
 
+import kotlinx.serialization.Serializable
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Size
 
+@Serializable
 data class SignupRequest(
     @NotBlank
     @Size(min = 3, max = 20)

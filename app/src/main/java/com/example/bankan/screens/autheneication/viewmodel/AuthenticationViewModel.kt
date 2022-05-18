@@ -3,12 +3,9 @@ package com.example.bankan.screens.autheneication.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bankan.data.repository.ProfileRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -66,7 +63,26 @@ class AuthenticationViewModel : KoinComponent, ViewModel() {
                 }
             }
 //            AuthenticationMode.SIGN_UP -> TODO()
-//            AuthenticationMode.SIGN_IN -> TODO()
+            AuthenticationMode.SIGN_IN -> {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true
+                )
+                runBlocking {
+                    if (profileRepository.authorize(
+                            _uiState.value.email,
+                            _uiState.value.password
+                        )
+                    ) {
+                        _uiState.value =
+                            _uiState.value.copy(isLoading = false, isAuthenticated = true)
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = "Incorrect login or password"
+                        )
+                    }
+                }
+            }
             else -> {
                 _uiState.value = _uiState.value.copy(
                     isLoading = true
