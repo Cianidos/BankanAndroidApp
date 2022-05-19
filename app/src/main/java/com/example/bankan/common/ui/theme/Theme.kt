@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 //    secondary = Teal200
 //)
 
-private val LightColorPalette = lightColors(
+val LightColorPalette = lightColors(
     primary = Color(0xFF494e50),
     primaryVariant = Color(0xFFc5c5c5),
     secondary = Color(0xFF26D9D9),

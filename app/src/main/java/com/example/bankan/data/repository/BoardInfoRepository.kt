@@ -10,4 +10,5 @@ interface BoardInfoRepository {
     suspend fun add(boardInfo: BoardInfo)
     suspend fun delete(localId: Int)
     suspend fun delete(boardInfo: BoardInfo)
+    suspend fun update(boardInfo: BoardInfo)
 }

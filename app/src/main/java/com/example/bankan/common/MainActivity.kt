@@ -4,9 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.screens.NavGraphs
 import com.example.bankan.screens.destinations.AuthenticationDestination
@@ -23,7 +26,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-                BankanApp()
+            BankanApp()
         }
     }
 }
@@ -36,22 +39,25 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BankanApp() {
     BankanTheme {
-        val vm: NavigationViewModel by viewModel()
-        val state: MainState by vm.state.collectAsState()
-        val navController = rememberAnimatedNavController()
-        val engine = rememberAnimatedNavHostEngine()
-        val currentScreen = when (state) {
-            MainState.Authorized.Guest -> BoardListScreenWithNavBarDestination
-            MainState.Authorized.LoggedIn -> BoardListScreenWithNavBarDestination
-            MainState.Loading -> LoadingScreenDestination
-            MainState.NotAuthorized -> AuthenticationDestination
+        CompositionLocalProvider(LocalContentColor provides Color.Black) {
+
+            val vm: NavigationViewModel by viewModel()
+            val state: MainState by vm.state.collectAsState()
+            val navController = rememberAnimatedNavController()
+            val engine = rememberAnimatedNavHostEngine()
+            val currentScreen = when (state) {
+                MainState.Authorized.Guest -> BoardListScreenWithNavBarDestination
+                MainState.Authorized.LoggedIn -> BoardListScreenWithNavBarDestination
+                MainState.Loading -> LoadingScreenDestination
+                MainState.NotAuthorized -> AuthenticationDestination
+            }
+            DestinationsNavHost(
+                navGraph = NavGraphs.root,
+                startRoute = currentScreen,
+                navController = navController,
+                engine = engine
+            )
         }
-        DestinationsNavHost(
-            navGraph = NavGraphs.root,
-            startRoute = currentScreen,
-            navController = navController,
-            engine = engine
-        )
     }
 }
 

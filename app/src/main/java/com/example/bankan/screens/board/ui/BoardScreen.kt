@@ -8,10 +8,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -86,7 +90,7 @@ fun BoardScreenWithNavBar(
     navD: DestinationsNavigator,
     r: ResultRecipient<CardEditorScreenDestination, String>
 ) {
-    CompositionLocalProvider (LocalRecipient provides r) {
+    CompositionLocalProvider(LocalRecipient provides r) {
         ContentWithBottomNavBar(nav = nav) { BoardScreen(it, nav = navD) }
     }
 }
@@ -130,8 +134,18 @@ fun BoardScreenContent(
         ) {
             LazyColumn {
                 stickyHeader {
-                    androidx.compose.material.Card {
-                        Text(text = data.info.name)
+                    androidx.compose.material.Card(
+                        elevation = 5.dp,
+                        backgroundColor = MaterialTheme.colors.primary,
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.padding(5.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(10.dp),
+                        ) {
+                            Text(text = data.info.name)
+                        }
                     }
                 }
                 item {
@@ -145,7 +159,13 @@ fun BoardScreenContent(
                     }
                 }
                 item {
-                    Spacer(modifier =Modifier.height(LocalConfiguration.current.screenHeightDp.div(2).dp))
+                    Spacer(
+                        modifier = Modifier.height(
+                            LocalConfiguration.current.screenHeightDp.div(
+                                2
+                            ).dp
+                        )
+                    )
                 }
             }
         }

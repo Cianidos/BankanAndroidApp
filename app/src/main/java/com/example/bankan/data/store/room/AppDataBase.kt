@@ -11,14 +11,14 @@ import com.example.bankan.data.models.ListInfo
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.*
+import java.time.LocalDate
 
 object Converters {
     @TypeConverter
-    fun fromTimestamp(value: Long?): Date? = value?.let { Date(it) }
+    fun fromTimestamp(value: Long?): LocalDate? = value?.let { LocalDate.ofEpochDay(it) }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? = date?.time
+    fun dateToTimestamp(date: LocalDate?): Long? = date?.toEpochDay()
 
 //    @TypeConverter
 //    fun tagToString(value: CardTag): String = JsonCoder.encodeToString(value)

@@ -12,7 +12,7 @@ import java.util.*
 
 object LocalDateSerializer : KSerializer<LocalDate> {
     override fun serialize(encoder: Encoder, value: LocalDate) = encoder.encodeLong(value.toEpochDay())
-    override fun deserialize(decoder: Decoder): LocalDate = LocalDate.ofEpochDay(decoder.decodeLong())
+    override fun deserialize(decoder: Decoder): LocalDate = try{ LocalDate.ofEpochDay(decoder.decodeLong())} catch (e: Exception) { LocalDate.now() }
     override val descriptor: SerialDescriptor
         get() = PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.LONG)
 }

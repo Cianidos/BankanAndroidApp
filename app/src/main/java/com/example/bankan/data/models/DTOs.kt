@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import com.example.bankan.data.ColorSerializer
 import kotlinx.serialization.Serializable
 import java.time.Instant
-import java.util.*
+import java.time.LocalDate
 
 @Immutable
 data class BoardData(val info: BoardInfo, val content: List<ListData>)
@@ -18,7 +18,7 @@ data class BoardInfo(
     val name: String,
     val description: String = "",
     val isOpen: Boolean = false,
-    val creationDate: Date = Date.from(Instant.EPOCH),
+    val creationDate: LocalDate = LocalDate.ofEpochDay(Instant.EPOCH.epochSecond),
     val id: Int? = null,
     @PrimaryKey(autoGenerate = true) val localId: Int = 0,
 )

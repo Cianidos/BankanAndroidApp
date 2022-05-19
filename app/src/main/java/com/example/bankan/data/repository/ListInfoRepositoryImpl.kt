@@ -25,4 +25,8 @@ class ListInfoRepositoryImpl : ListInfoRepository, KoinComponent {
     override suspend fun delete(listInfo: ListInfo) {
         listDao.delete(listInfo)
     }
+
+    override suspend fun update(listInfo: ListInfo) {
+        listDao.update(listInfo)
+    }
 }

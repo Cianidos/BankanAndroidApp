@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.bankan.common.ui.components.CreateNewButton
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
+import com.example.bankan.common.ui.theme.LightColorPalette
 import com.example.bankan.data.models.CardInfo
 import com.example.bankan.data.models.ListInfo
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
@@ -64,7 +64,7 @@ fun Card(
 
     Column(
         modifier = modifier
-            .background(color = Color.LightGray, shape = RoundedCornerShape(20.dp))
+            .background(color = MaterialTheme.colors.surface, shape = RoundedCornerShape(20.dp))
             .width(250.dp)
             .wrapContentHeight(),
     ) {
@@ -84,10 +84,10 @@ fun Card(
                         drawRect(
                             brush = Brush.horizontalGradient(
                                 0.95f to Color.Transparent,
-                                1f to Color.LightGray,
+                                1f to LightColorPalette.surface,
                             ),
                             topLeft = Offset(190.dp.toPx(), 0.dp.toPx()),
-                            size = Size(25.dp.toPx(), 30.dp.toPx())
+                            size = Size(25.dp.toPx(), 30.dp.toPx()),
                         )
                     },
                 horizontalArrangement = Arrangement.Start,
@@ -105,7 +105,8 @@ fun Card(
                         Text(
                             text = tag.name,
                             modifier = Modifier,
-                            overflow = TextOverflow.Visible
+                            overflow = TextOverflow.Visible,
+                            color = Color.Black
                         )
                     }
                 }
@@ -132,17 +133,19 @@ fun Card(
             Text(
                 text = name,
                 style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(8.dp, 0.dp)
+                modifier = Modifier.padding(8.dp, 0.dp),
+                color = Color.Black
             )
         }
         AnimatedVisibility(visible = description.isNotEmpty()) {
-            ClickableText(
+            Text(
                 text = buildAnnotatedString { append(description) },
                 style = MaterialTheme.typography.body1,
                 modifier = Modifier.padding(5.dp),
                 maxLines = 4,
-                overflow = TextOverflow.Ellipsis
-            ) {}
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Black
+            )
         }
     }
 }

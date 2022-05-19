@@ -8,5 +8,6 @@ interface ListInfoRepository {
     suspend fun add(listInfo: ListInfo)
     suspend fun delete(localId: Int)
     suspend fun delete(listInfo: ListInfo)
+    suspend fun update(listInfo: ListInfo)
 }
 

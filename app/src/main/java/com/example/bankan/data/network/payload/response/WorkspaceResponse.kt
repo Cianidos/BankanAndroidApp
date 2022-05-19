@@ -1,8 +1,8 @@
 package com.example.bankan.data.network.payload.response
 
-import com.example.bankan.data.DateSerializer
+import com.example.bankan.data.LocalDateSerializer
 import kotlinx.serialization.Serializable
-import java.util.*
+import java.time.LocalDate
 
 
 @Serializable
@@ -18,6 +18,6 @@ class BoardInfoResponseAndId(
     var name: String? = null,
     var description: String? = null,
     var isOpen: Boolean = false,
-    @Serializable(DateSerializer::class)
-    var creationData: Date? = null
+    @Serializable(LocalDateSerializer::class)
+    var creationData: LocalDate? = null
 )

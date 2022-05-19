@@ -37,18 +37,27 @@ fun List1(
     BankanTheme {
         Column(
             modifier = Modifier
-                .background(Color.DarkGray, RoundedCornerShape(20.dp))
+                .background(MaterialTheme.colors.primaryVariant, RoundedCornerShape(20.dp))
                 .width(280.dp)
                 .animateContentSize { initialValue, targetValue -> },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = data.info.name,
-                style = MaterialTheme.typography.h6,
+            androidx.compose.material.Card(
+                backgroundColor = MaterialTheme.colors.primary,
+                shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
-                    .background(Color.Gray, RoundedCornerShape(20.dp))
                     .fillMaxWidth()
-            )
+                    .padding(5.dp),
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)) {
+
+                    Text(
+                        text = data.info.name,
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White
+                    )
+                }
+            }
             EachAndBetween(data = data.content) { card ->
                 SwipeableElement(onSwipe = { vm.deleteCard(card.localId) }) {
                     val anim = remember {

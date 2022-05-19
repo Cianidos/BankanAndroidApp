@@ -2,6 +2,7 @@ package com.example.bankan.screens
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -86,147 +87,166 @@ fun CardEditorScreen(
         }
     }.toSet().toList()
 
-    Surface(
-        onClick = { isEntering = false; currentSelectedTag = null; newTagName = ""; focusManager.clearFocus() },
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    Surface(modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colors.background)) {
+        Surface(
+            onClick = {
+                isEntering = false; currentSelectedTag = null; newTagName =
+                ""; focusManager.clearFocus()
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            elevation = 5.dp,
+            shape = RoundedCornerShape(20.dp)
         ) {
-            LazyColumn(
-                modifier = modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-                    .animateContentSize { initialValue, targetValue -> },
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                item {
-                    LazyRow(
-                        modifier = Modifier.wrapContentSize(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        eachAndBetween(
-                            data = tagList.withIndex().toList(), spacerWidth = 5.dp
-                        ) { (idx, tag) ->
-                            Surface(
-                                shape = RoundedCornerShape(20.dp),
-                                modifier = Modifier
-                                    .defaultMinSize(1.dp, 1.dp)
-                                    .height(30.dp)
-                                    .wrapContentWidth(),
-                                color = tag.color
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(horizontal = 10.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
+                LazyColumn(
+                    modifier = modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                        .animateContentSize { initialValue, targetValue -> },
+                ) {
+                    item {
+                        LazyRow(
+                            modifier = Modifier.wrapContentSize(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            eachAndBetween(
+                                data = tagList.withIndex().toList(), spacerWidth = 5.dp
+                            ) { (idx, tag) ->
+                                Surface(
+                                    shape = RoundedCornerShape(20.dp),
+                                    modifier = Modifier
+                                        .defaultMinSize(1.dp, 1.dp)
+                                        .height(30.dp)
+                                        .wrapContentWidth(),
+                                    color = tag.color
                                 ) {
-                                    BasicTextField(
-                                        value = tag.name,
-                                        modifier = Modifier
-                                            .width(IntrinsicSize.Min)
-                                            .onFocusEvent {
-                                                if (it.isFocused) {
-                                                    currentColorIndex =
-                                                        colorsList.indexOf(tag.color)
-                                                    currentSelectedTag = idx
-                                                }
-                                            },
-                                        singleLine = true,
-                                        onValueChange = {
-                                            tagList[idx] = tagList[idx].copy(name = it)
-                                        }
-                                    )
+                                    Column(
+                                        modifier = Modifier.padding(horizontal = 10.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        BasicTextField(
+                                            value = tag.name,
+                                            modifier = Modifier
+                                                .width(IntrinsicSize.Min)
+                                                .onFocusEvent {
+                                                    if (it.isFocused) {
+                                                        currentColorIndex =
+                                                            colorsList.indexOf(tag.color)
+                                                        currentSelectedTag = idx
+                                                    }
+                                                },
+                                            singleLine = true,
+                                            onValueChange = {
+                                                tagList[idx] = tagList[idx].copy(name = it)
+                                            }
+                                        )
+                                    }
                                 }
                             }
+                            item {
+                                Spacer(modifier = Modifier.size(10.dp))
+                            }
+                            item {
+                                CreateNewButton(
+                                    modifier = Modifier.width(IntrinsicSize.Min),
+                                    isEntering = isEntering,
+                                    name = newTagName,
+                                    onCreateNew = { newTagName = ""; isEntering = true },
+                                    onNameChanged = { newTagName = it },
+                                    onSubmit = {
+                                        isEntering = false
+                                        tagList += CardTag(
+                                            newTagName,
+                                            colorsList[currentColorIndex]
+                                        )
+                                    }
+                                )
+                            }
                         }
-                        item {
-                            Spacer(modifier = Modifier.size(10.dp))
-                        }
-                        item {
-                            CreateNewButton(
-                                modifier = Modifier.width(IntrinsicSize.Min),
-                                isEntering = isEntering,
-                                name = newTagName,
-                                onCreateNew = { newTagName = ""; isEntering = true },
-                                onNameChanged = { newTagName = it },
-                                onSubmit = {
-                                    isEntering = false
-                                    tagList += CardTag(
-                                        newTagName,
-                                        colorsList[currentColorIndex]
+                    }
+
+                    item {
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateContentSize { initialValue, targetValue -> },
+                            value = card.name,
+                            onValueChange = { card = card.copy(name = it) },
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                    }
+
+                    item {
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateContentSize { initialValue, targetValue -> },
+                            value = card.description,
+                            onValueChange = { card = card.copy(description = it) },
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                    }
+
+                    item {
+                        Row(
+                            modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(), horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(
+                                modifier = Modifier.heightIn(min = 20.dp),
+                                onClick = {
+                                    resultNav.navigateBack(
+                                        Json.encodeToString(
+                                            card.copy(
+                                                tags = tagList.toList()
+                                            )
+                                        )
                                     )
-                                }
-                            )
+                                }) {
+                                Icon(Icons.Outlined.Check, contentDescription = null)
+                            }
                         }
                     }
-                }
-
-                item {
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .animateContentSize { initialValue, targetValue -> },
-                        value = card.name,
-                        onValueChange = { card = card.copy(name = it) }
-                    )
-                }
-
-                item {
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .animateContentSize { initialValue, targetValue -> },
-                        value = card.description,
-                        onValueChange = { card = card.copy(description = it) }
-                    )
-                }
-
-                item {
-                    Row(
-                        modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(), horizontalArrangement = Arrangement.End
-                    ) {
-                        IconButton(
-                            modifier = Modifier.heightIn(min = 20.dp),
-                            onClick = { resultNav.navigateBack(Json.encodeToString(card.copy(tags = tagList.toList()))) }) {
-                            Icon(Icons.Outlined.Check, contentDescription = null)
-                        }
-                    }
-                }
-                item {
-                    FlowRow {
-                        colorsList.forEachIndexed { idx, color ->
-                            if (idx == currentColorIndex) {
-                                DashOutline {
+                    item {
+                        FlowRow {
+                            colorsList.forEachIndexed { idx, color ->
+                                if (idx == currentColorIndex) {
+                                    DashOutline {
+                                        Surface(
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                                .padding(5.dp),
+                                            shape = CircleShape,
+                                            color = color
+                                        ) { }
+                                    }
+                                } else {
                                     Surface(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .padding(5.dp),
                                         shape = CircleShape,
-                                        color = color
+                                        color = color,
+                                        onClick = {
+                                            currentColorIndex = idx
+                                            currentSelectedTag?.let {
+                                                tagList[it] =
+                                                    tagList[it].copy(color = colorsList[currentColorIndex])
+                                            }
+                                        }
                                     ) { }
                                 }
-                            } else {
-                                Surface(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .padding(5.dp),
-                                    shape = CircleShape,
-                                    color = color,
-                                    onClick = {
-                                        currentColorIndex = idx
-                                        currentSelectedTag?.let {
-                                            tagList[it] =
-                                                tagList[it].copy(color = colorsList[currentColorIndex])
-                                        }
-                                    }
-                                ) { }
                             }
                         }
                     }

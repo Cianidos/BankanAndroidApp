@@ -12,6 +12,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
@@ -21,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -30,7 +32,6 @@ import com.example.bankan.common.ui.components.SwipeableElement
 import com.example.bankan.common.ui.eachAndBetween
 import com.example.bankan.common.ui.theme.BankanTheme
 import com.example.bankan.data.models.BoardInfo
-import com.example.bankan.data.repository.ProfileRepository
 import com.example.bankan.screens.destinations.BoardScreenWithNavBarDestination
 import com.example.bankan.screens.main.viewmodel.MainMenuUiModel
 import com.example.bankan.screens.main.viewmodel.MainMenuUiStates
@@ -38,7 +39,6 @@ import com.example.bankan.screens.main.viewmodel.MainMenuViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.DestinationStyle
-import org.koin.androidx.compose.inject
 import org.koin.androidx.compose.viewModel
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -60,7 +60,7 @@ object BoardListAnimationStyle : DestinationStyle.Animated {
 @Destination(style = BoardListAnimationStyle::class)
 @Composable
 fun BoardListScreenWithNavBar(modifier: Modifier = Modifier, nav: NavController) {
-    val profileRepository: ProfileRepository by inject()
+//    val profileRepository: ProfileRepository by inject()
     ContentWithBottomNavBar(nav = nav) {
         MainMenu(it) { boardId -> nav.navigate(BoardScreenWithNavBarDestination) }
     }
@@ -128,7 +128,7 @@ fun BoardList(
     onChangeNewBoardName: (String) -> Unit,
     onSubmitNewBoard: () -> Unit,
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(modifier = modifier.padding(5.dp)) {
         eachAndBetween(data = uiModel.boardInfoList.withIndex().toList()) {
             BoardCard(
                 modifier = animatePlacement(),
@@ -139,7 +139,7 @@ fun BoardList(
         item {
             Spacer(
                 modifier = animatePlacement()
-                    .height(10.dp)
+                    .height(5.dp)
                     .fillMaxWidth()
             )
         }
@@ -171,8 +171,17 @@ fun BoardCard(
     onBoardChosen: () -> Unit
 ) {
     SwipeableElement(modifier = modifier, onSwipe = onDelete) {
-        Card(onClick = onBoardChosen) {
-            Text(text = boardInfo.name)
+        Card(
+            onClick = onBoardChosen,
+            elevation = 5.dp,
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(10.dp),
+            ) {
+                Text(text = boardInfo.name, modifier = Modifier.shadow(0.dp))
+            }
         }
     }
 }

@@ -32,4 +32,8 @@ class LocalBoardInfoRepositoryImpl : BoardInfoRepository, KoinComponent {
     override suspend fun delete(boardInfo: BoardInfo) {
         boardInfoDao.delete(boardInfo)
     }
+
+    override suspend fun update(boardInfo: BoardInfo) {
+        boardInfoDao.update(boardInfo)
+    }
 }

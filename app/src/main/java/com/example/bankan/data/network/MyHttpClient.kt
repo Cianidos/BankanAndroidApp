@@ -49,39 +49,45 @@ object MyHttpClient : KoinComponent {
         install(Auth) {
             bearer {
                 loadTokens { BearerTokens(token, "") }
+                refreshTokens {
+                    BearerTokens(token, "")
+                }
             }
         }
 
         install(ResponseObserver) {
-            onResponse { }
+            onResponse {
+            }
         }
 
         install(DefaultRequest) {
             header(HttpHeaders.ContentType, ContentType.Application.Json)
-//            header(HttpHeaders.Authorization, )
+        }
+    }
+
+    private suspend inline fun <reified T> HttpResponse.check(): T? {
+        return when (this.status) {
+            HttpStatusCode.OK -> this.body()
+            HttpStatusCode.Unauthorized -> {
+                CoroutineScope(Dispatchers.IO).launch {
+                    pref.logout()
+                }
+                null
+            }
+            else -> null
         }
     }
 
     object AuthenticationApi {
         private const val apiAuthUrl = "/api/auth"
-        suspend fun registerUser(signupRequest: SignupRequest): Boolean {
-            val r = client.post(urlString = "$baseUrl$apiAuthUrl/signup") {
+        suspend fun registerUser(signupRequest: SignupRequest): Boolean =
+            client.post(urlString = "$baseUrl$apiAuthUrl/signup") {
                 setBody(signupRequest)
-            }
-            return when (r.status) {
-                HttpStatusCode.OK -> true
-                else -> false
-            }
-        }
+            }.check<Unit>() != null
 
-        suspend fun authenticateUser(loginRequest: LoginRequest): JwtResponse? {
-            val resp: HttpResponse =
-                client.post(urlString = "$baseUrl$apiAuthUrl/signin") { setBody(body = loginRequest) }
-            return when (resp.status) {
-                HttpStatusCode.OK -> resp.body()
-                else -> null
-            }
-        }
+        suspend fun authenticateUser(loginRequest: LoginRequest): JwtResponse? =
+            client.post(urlString = "$baseUrl$apiAuthUrl/signin") { setBody(body = loginRequest) }
+                .check()
     }
 
     object UserApi {
@@ -104,8 +110,8 @@ object MyHttpClient : KoinComponent {
         suspend fun getWorkspace(workspaceId: Int): WorkspaceResponse =
             client.get(urlString = "$baseUrl$workspaceApiUrl/$workspaceId").body()
 
-        suspend fun getWorkspaceByUserId(userId: Int): WorkspaceResponse =
-            client.get(urlString = "$baseUrl$workspaceApiUrl/user/$userId").body()
+        suspend fun getWorkspaceByUserId(userId: Int): WorkspaceResponse? =
+            client.get(urlString = "$baseUrl$workspaceApiUrl/user/$userId").check()
     }
 
     object SettingsApi {

@@ -16,7 +16,7 @@ private val Context.preferences: DataStore<Preferences> by preferencesDataStore(
 
 val dataModule = module {
     single { get<Context>().preferences as DataStore<Preferences> }
-
+    single { LocalBoardInfoRepositoryImpl() as LocalBoardInfoRepositoryImpl }
     single { LocalBoardInfoRepositoryImpl() as BoardInfoRepository }
     single { ListInfoRepositoryImpl() as ListInfoRepository }
     single { CardInfoRepositoryImpl() as CardInfoRepository }
