@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.*
 import com.example.bankan.data.network.MyHttpClient
 import com.example.bankan.data.network.payload.request.LoginRequest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -12,6 +13,7 @@ import org.koin.core.component.inject
 
 // TODO remake to sealed class UserState
 
+// TODO userNickname and userLogin is different things, but in ProfileRepository userName (nickname) used as login
 interface ProfileRepository {
     val isAuthorized: Flow<Boolean>
     val isGuest: Flow<Boolean>
@@ -22,6 +24,7 @@ interface ProfileRepository {
 
     suspend fun setUserName(name: String)
     suspend fun authorize(login: String, password: String): Boolean
+    suspend fun reLogin(): Boolean
     suspend fun continueAsGuest(userName: String)
     suspend fun setNewCurrentBoardId(localId: Int)
     suspend fun logout()
@@ -34,6 +37,7 @@ object PreferencesKeys {
     val userId = intPreferencesKey("USER_ID")
     val username = stringPreferencesKey("USERNAME")
     val boardId = intPreferencesKey("CURRENT_BOARD_ID")
+    val password = stringPreferencesKey("PASSWORD")
 }
 
 
@@ -74,7 +78,7 @@ class ProfileRepositoryInDataStoreNoInternetImpl : ProfileRepository, KoinCompon
             it[PreferencesKeys.boardId]
         }
 
-    override suspend fun authorize(login: String, password: String):Boolean {
+    override suspend fun authorize(login: String, password: String): Boolean {
         return MyHttpClient.AuthenticationApi.authenticateUser(LoginRequest(login, password))
             ?.let { resp ->
                 preferences.edit {
@@ -83,8 +87,19 @@ class ProfileRepositoryInDataStoreNoInternetImpl : ProfileRepository, KoinCompon
                     it[PreferencesKeys.isGuest] = false
                     it[PreferencesKeys.username] = resp.login
                     it[PreferencesKeys.userId] = resp.id
+                    it[PreferencesKeys.password] = password
                 }
             } != null
+    }
+
+    override suspend fun reLogin(): Boolean {
+        return preferences.data.first().let { pref ->
+            pref[PreferencesKeys.username]?.let { login ->
+                pref[PreferencesKeys.password]?.let { password ->
+                    authorize(login, password)
+                }
+            } ?: false
+        }
     }
 
     override suspend fun continueAsGuest(userName: String) {

@@ -50,7 +50,10 @@ object MyHttpClient : KoinComponent {
             bearer {
                 loadTokens { BearerTokens(token, "") }
                 refreshTokens {
-                    BearerTokens(token, "")
+                    when (pref.reLogin()) {
+                        true -> BearerTokens(token, "")
+                        false -> TODO("Login screen when refreshing screen required")
+                    }
                 }
             }
         }
