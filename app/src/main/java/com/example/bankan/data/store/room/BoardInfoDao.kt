@@ -28,3 +28,39 @@ interface BoardInfoDao {
     @Query("SELECT * FROM BoardInfo LIMIT 1")
     fun getOne(): Flow<BoardInfo>
 }
+
+@Dao
+interface AuthedBoardInfoDao {
+    @Insert
+    suspend fun insert(board: BoardInfo)
+
+    @Update
+    suspend fun update(vararg boards: BoardInfo)
+
+    @Delete
+    suspend fun delete(vararg boards: BoardInfo)
+
+    @Query("DELETE FROM BoardInfo WHERE localId = :boardId")
+    suspend fun deleteByLocalId(boardId: Int)
+
+    @Query("SELECT * FROM BoardInfo where id != null")
+    fun getAll(): Flow<List<BoardInfo>>
+
+    @Query("SELECT * FROM BoardInfo WHERE localId = :boardId and id != null")
+    fun getOne(boardId: Int): Flow<BoardInfo>
+
+    @Query("SELECT * FROM BoardInfo where id != 0 LIMIT 1")
+    fun getOne(): Flow<BoardInfo>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertIgnore(vararg board: BoardInfo): Long
+
+    @Transaction
+    suspend fun insertOrUpdate(vararg boards: BoardInfo) {
+        boards.forEach { board ->
+            if (insertIgnore(board) == -1L) {
+                update(board)
+            }
+        }
+    }
+}

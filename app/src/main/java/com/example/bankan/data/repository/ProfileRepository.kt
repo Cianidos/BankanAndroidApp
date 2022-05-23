@@ -30,6 +30,7 @@ interface ProfileRepository {
     suspend fun logout()
 }
 
+
 object PreferencesKeys {
     val sessionToken = stringPreferencesKey("SESSION_TOKEN")
     val isAuthorized = booleanPreferencesKey("AUTHORIZED")
@@ -41,6 +42,7 @@ object PreferencesKeys {
 }
 
 
+// TODO: NO INTERNET now is not meaningful
 class ProfileRepositoryInDataStoreNoInternetImpl : ProfileRepository, KoinComponent {
 
     private val preferences: DataStore<Preferences> by inject()
