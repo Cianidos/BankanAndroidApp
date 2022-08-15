@@ -5,8 +5,8 @@ import com.example.bankan.data.dataModule
 import com.example.bankan.screens.screensModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.context.GlobalContext.startKoin
+import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
 @Suppress("unused")
@@ -19,7 +19,7 @@ class BankanApplication : Application() {
             androidContext(this@BankanApplication)
             modules(screensModule, dataModule,
                 module {
-                    viewModel { NavigationViewModel() }
+                    viewModelOf(::NavigationViewModel)
                 })
         }
     }

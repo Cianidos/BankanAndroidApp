@@ -4,7 +4,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.TargetBasedAnimation
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,15 +24,14 @@ import com.example.bankan.data.models.ListData
 import com.example.bankan.data.models.ListInfo
 import com.example.bankan.screens.board.viewmodel.BoardScreenViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.getViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun List1(
     data: ListData,
     nav: DestinationsNavigator,
 ) {
-    val vm: BoardScreenViewModel by viewModel()
+    val vm: BoardScreenViewModel = getViewModel()
     BankanTheme {
         Column(
             modifier = Modifier
@@ -50,7 +48,6 @@ fun List1(
                     .padding(5.dp),
             ) {
                 Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)) {
-
                     Text(
                         text = data.info.name,
                         style = MaterialTheme.typography.h6,
@@ -93,13 +90,14 @@ fun List1(
 
 @Composable
 fun AddNewList(modifier: Modifier = Modifier) {
-    val vm: BoardScreenViewModel by viewModel()
+    val vm: BoardScreenViewModel = getViewModel()
     val boardInfo by vm.boardInfo().collectAsState(initial = BoardInfo(""))
     val isEntering by vm.isEnteringNewListName.collectAsState()
     val newListName by vm.newListName.collectAsState()
 
     BankanTheme {
         CreateNewButton(
+            modifier = modifier,
             isEntering = isEntering,
             name = newListName,
             onCreateNew = { vm.isEnteringNewListName.value = true },

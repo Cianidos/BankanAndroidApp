@@ -39,7 +39,7 @@ import com.example.bankan.screens.main.viewmodel.MainMenuViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.DestinationStyle
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 object BoardListAnimationStyle : DestinationStyle.Animated {
@@ -61,17 +61,18 @@ object BoardListAnimationStyle : DestinationStyle.Animated {
 @Composable
 fun BoardListScreenWithNavBar(modifier: Modifier = Modifier, nav: NavController) {
 //    val profileRepository: ProfileRepository by inject()
-    ContentWithBottomNavBar(nav = nav) {
+    ContentWithBottomNavBar(modifier = modifier, nav = nav) {
         MainMenu(it) { boardId -> nav.navigate(BoardScreenWithNavBarDestination) }
     }
 }
 
 @Composable
 fun MainMenu(modifier: Modifier = Modifier, onBoardChosen: (boardId: Int) -> Unit) {
-    val vm: MainMenuViewModel by viewModel()
+    val vm: MainMenuViewModel = getViewModel()
     val uiModel by vm.uiModel.collectAsState()
 
     MainMenuContent(
+        modifier = modifier,
         uiModel = uiModel,
         onBoardChosen = { vm.chooseCurrentBoard(it); onBoardChosen(it) },
         onCreateNewBoard = { vm.createNewBoard() },
@@ -91,7 +92,7 @@ fun MainMenuContent(
     onSubmitNewBoard: () -> Unit,
     onDelete: (boardId: Int) -> Unit,
 ) {
-    val vm: MainMenuViewModel by viewModel()
+    val vm: MainMenuViewModel = getViewModel()
     BankanTheme {
         Column(modifier = modifier
             .fillMaxSize()

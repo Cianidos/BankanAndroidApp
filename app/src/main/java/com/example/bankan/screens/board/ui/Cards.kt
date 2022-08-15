@@ -38,7 +38,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.getViewModel
 
 
 @Composable
@@ -47,7 +47,7 @@ fun Card(
     nav: DestinationsNavigator,
     cardInfo: CardInfo
 ) {
-    val vm by viewModel<BoardScreenViewModel>()
+    val vm = getViewModel<BoardScreenViewModel>()
 
     LocalRecipient.current.onNavResult {
         when (it) {
@@ -152,7 +152,7 @@ fun Card(
 
 @Composable
 fun AddNewCard(modifier: Modifier = Modifier, listInfo: ListInfo) {
-    val vm: BoardScreenViewModel by viewModel()
+    val vm: BoardScreenViewModel = getViewModel()
     val isEntering by vm.isEnteringNewCardName.collectAsState()
     val newCardName by vm.newCardName.collectAsState()
     val enteringListId by vm.currentListCardFocus.collectAsState()

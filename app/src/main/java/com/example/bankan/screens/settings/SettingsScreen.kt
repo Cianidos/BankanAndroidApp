@@ -29,7 +29,7 @@ import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.DestinationStyle
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.getViewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -51,7 +51,7 @@ object SettingsAnimationStyle : DestinationStyle.Animated {
 @Destination(style = SettingsAnimationStyle::class)
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier, nav: NavController) {
-    ContentWithBottomNavBar(nav = nav) { SettingsScreenContent(it, nav) }
+    ContentWithBottomNavBar(modifier = modifier, nav = nav) { SettingsScreenContent(it, nav) }
 }
 
 class SettingsViewModel : KoinComponent, ViewModel() {
@@ -77,7 +77,7 @@ class SettingsViewModel : KoinComponent, ViewModel() {
 
 @Composable
 private fun SettingsScreenContent(modifier: Modifier = Modifier, nav: NavController) {
-    val vm: SettingsViewModel by viewModel()
+    val vm: SettingsViewModel = getViewModel()
     val profile by vm.profileInfo.collectAsState(initial = SettingsViewModel.ProfileInfo())
     Surface(
         modifier = modifier.fillMaxSize(),

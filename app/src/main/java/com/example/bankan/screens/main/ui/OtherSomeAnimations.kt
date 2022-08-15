@@ -105,8 +105,9 @@ fun AnimatedDashedOutlineCard(modifier: Modifier = Modifier, content: @Composabl
     val vm by viewModel<AnimationViewModel>()
     val time by vm.times.collectAsState()
 
+
     fun Int.breakOn(pointOfBreak: Int): Int {
-        return if (this <= pointOfBreak) this else pointOfBreak * 2 - this
+        return@breakOn if (this <= pointOfBreak) this else pointOfBreak * 2 - this
     }
 
     val intervals = floatArrayOf(

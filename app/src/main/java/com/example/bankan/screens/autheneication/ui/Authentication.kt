@@ -31,7 +31,7 @@ import com.example.bankan.screens.autheneication.viewmodel.*
 import com.example.bankan.screens.destinations.BoardListScreenWithNavBarDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.getViewModel
 
 
 @Composable
@@ -39,9 +39,8 @@ import org.koin.androidx.compose.viewModel
 fun Authentication(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
-    onAppEnter: () -> Unit = {}
 ) {
-    val viewModel: AuthenticationViewModel by viewModel()
+    val viewModel: AuthenticationViewModel = getViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     BankanTheme {
@@ -61,7 +60,7 @@ fun AuthenticationContent(
     handleEvent: (event: AuthenticationEvent) -> Unit,
     appEnter: () -> Unit
 ) {
-    val vm: AuthenticationViewModel by viewModel()
+    val vm: AuthenticationViewModel = getViewModel()
     BankanTheme {
         Box(
             modifier = modifier,

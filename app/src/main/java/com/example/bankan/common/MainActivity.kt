@@ -18,11 +18,10 @@ import com.example.bankan.screens.destinations.LoadingScreenDestination
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.getViewModel
 
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -38,10 +37,9 @@ class MainActivity : ComponentActivity() {
 )
 @Composable
 fun BankanApp() {
+    val vm: NavigationViewModel = getViewModel()
     BankanTheme {
         CompositionLocalProvider(LocalContentColor provides Color.Black) {
-
-            val vm: NavigationViewModel by viewModel()
             val state: MainState by vm.state.collectAsState()
             val navController = rememberAnimatedNavController()
             val engine = rememberAnimatedNavHostEngine()

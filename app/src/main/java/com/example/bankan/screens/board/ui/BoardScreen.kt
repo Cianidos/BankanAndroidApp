@@ -40,7 +40,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.EmptyResultRecipient
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.ramcosta.composedestinations.spec.DestinationStyle
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.getViewModel
 
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -91,7 +91,7 @@ fun BoardScreenWithNavBar(
     r: ResultRecipient<CardEditorScreenDestination, String>
 ) {
     CompositionLocalProvider(LocalRecipient provides r) {
-        ContentWithBottomNavBar(nav = nav) { BoardScreen(it, nav = navD) }
+        ContentWithBottomNavBar(modifier = modifier, nav = nav) { BoardScreen(it, nav = navD) }
     }
 }
 
@@ -100,7 +100,7 @@ fun BoardScreen(
     modifier: Modifier = Modifier,
     nav: DestinationsNavigator,
 ) {
-    val vm: BoardScreenViewModel by viewModel()
+    val vm: BoardScreenViewModel = getViewModel()
     val boardInfo by vm.boardInfo().collectAsState(initial = BoardInfo(""))
     val listInfo by vm.listData().collectAsState(initial = emptyList())
 
@@ -124,7 +124,7 @@ fun BoardScreenContent(
     data: BoardData,
     nav: DestinationsNavigator,
 ) {
-    val vm: BoardScreenViewModel by viewModel()
+    val vm: BoardScreenViewModel = getViewModel()
     BankanTheme {
         Surface(modifier
             .clickable(
